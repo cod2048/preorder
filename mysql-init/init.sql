@@ -1,0 +1,4 @@
+-- init.sql
+CREATE USER 'hanghae'@'%' IDENTIFIED BY 'hanghae';
+GRANT ALL PRIVILEGES ON *.* TO 'hanghae'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
