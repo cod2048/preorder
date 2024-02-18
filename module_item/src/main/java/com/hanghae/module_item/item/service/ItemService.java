@@ -69,4 +69,12 @@ public class ItemService {
         return new GetItemResponse(item.getTitle(), item.getDescription(), item.getPrice());
     }
 
+    @Transactional
+    public Long getItemStocks(Long itemNum) {
+        Stock stocks = stockRepository.findById(itemNum)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: "  + itemNum));
+
+        return stocks.getStock();
+    }
+
 }

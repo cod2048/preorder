@@ -35,4 +35,9 @@ public class ItemController {
     public ResponseEntity<GetItemResponse> getItemDetails(@PathVariable Long itemNum){
         return ResponseEntity.ok(itemService.getItemDetails(itemNum));
     }
+
+    @GetMapping("/stocks/{itemNum}")
+    public ResponseEntity<Long> getItemStocks(@PathVariable Long itemNum) {
+        return ResponseEntity.ok(itemService.getItemStocks(itemNum));
+    }
 }
