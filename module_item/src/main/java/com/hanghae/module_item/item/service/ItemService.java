@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 public class ItemService {
@@ -44,4 +47,15 @@ public class ItemService {
 
         return createItemResponse;
     }
+
+    @Transactional
+    public List<String> getAllItems(){
+        List<String> titles = itemRepository.findAllByDeletedAtIsNull()
+                .stream()
+                .map(Item::getTitle)
+                .collect(Collectors.toList());
+
+        return titles;
+    }
 }
+ 
