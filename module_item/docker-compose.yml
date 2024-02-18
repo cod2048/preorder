@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_item
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_item:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      - hanghae_network
+
+volumes:
+  db_item:
+
+networks:
+  hanghae_network:
