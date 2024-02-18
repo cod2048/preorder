@@ -2,15 +2,18 @@ package com.hanghae.module_item.item.service;
 
 import com.hanghae.module_item.item.dto.CreateItemRequest;
 import com.hanghae.module_item.item.dto.CreateItemResponse;
+import com.hanghae.module_item.item.dto.GetItemResponse;
 import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;
 import com.hanghae.module_item.item.repository.ItemRepository;
 import com.hanghae.module_item.item.repository.StockRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,5 +60,13 @@ public class ItemService {
 
         return titles;
     }
+
+    @Transactional
+    public GetItemResponse getItemDetails(Long itemNum){
+        Item item = itemRepository.findById(itemNum)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + itemNum));
+
+        return new GetItemResponse(item.getTitle(), item.getDescription(), item.getPrice());
+    }
+
 }
- 
