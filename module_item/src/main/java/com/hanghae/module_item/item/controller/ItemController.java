@@ -1,0 +1,25 @@
+package com.hanghae.module_item.item.controller;
+
+import com.hanghae.module_item.item.dto.CreateItemRequest;
+import com.hanghae.module_item.item.dto.CreateItemResponse;
+import com.hanghae.module_item.item.service.ItemService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@Slf4j
+@RequestMapping("/api/items")
+public class ItemController {
+
+    private final ItemService itemService;
+
+    public ItemController(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
+    @PostMapping
+    public ResponseEntity<CreateItemResponse> create(@RequestBody CreateItemRequest createItemRequest) {
+        return ResponseEntity.ok(itemService.create(createItemRequest));
+    }
+}
