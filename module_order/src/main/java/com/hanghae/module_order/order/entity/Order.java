@@ -55,7 +55,13 @@ public class Order {
         INITIATED,
         IN_PROGRESS,
         COMPLETED,
-        FAILED,
+        FAILED_CUSTOMER,
+        FAILED_QUANTITY,
         CANCELED
     }
+
+    public void updateStatus(OrderStatus status) {
+        this.status = status;
+    }
+
 }
