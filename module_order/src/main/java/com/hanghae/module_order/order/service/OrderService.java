@@ -1,6 +1,7 @@
 package com.hanghae.module_order.order.service;
 
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
+import com.hanghae.module_order.order.dto.request.CreateTryPaymentRequest;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +28,22 @@ public class OrderService {
                 .build();
 
         orderRepository.save(order);
+    }
+
+    @Transactional
+    public Order.OrderStatus tryPayment(CreateTryPaymentRequest createTryPaymentRequest) {
+        Order order = orderRepository.findById(createTryPaymentRequest.getOrderNum())
+                .orElseThrow(() -> new IllegalArgumentException("order not exist"));
+
+        order.updateStatus(Order.OrderStatus.IN_PROGRESS);
+
+        double chance = Math.random();
+        if (chance < 0.2) {
+            order.updateStatus(Order.OrderStatus.FAILED_CUSTOMER);
+        } else {
+            order.updateStatus(Order.OrderStatus.IN_PROGRESS);
+        }
+
+        return order.getStatus();
     }
 }
