@@ -1,6 +1,5 @@
 package com.hanghae.module_item.item.entity;
 
-import com.hanghae.module_item.item.dto.CreateItemRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

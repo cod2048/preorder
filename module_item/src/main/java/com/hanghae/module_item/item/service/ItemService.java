@@ -1,8 +1,8 @@
 package com.hanghae.module_item.item.service;
 
-import com.hanghae.module_item.item.dto.CreateItemRequest;
-import com.hanghae.module_item.item.dto.CreateItemResponse;
-import com.hanghae.module_item.item.dto.GetItemResponse;
+import com.hanghae.module_item.item.dto.request.CreateItemRequest;
+import com.hanghae.module_item.item.dto.response.CreateItemResponse;
+import com.hanghae.module_item.item.dto.response.GetItemResponse;
 import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;
 import com.hanghae.module_item.item.repository.ItemRepository;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -1,6 +1,5 @@
 package com.hanghae.module_item.item.entity;
 
-import com.hanghae.module_item.item.dto.CreateItemRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -9,11 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -31,6 +26,10 @@ public class Stock {
     public Stock(Long itemNum, Long stock) {
         this.itemNum = itemNum;
         this.stock = stock;
+    }
+
+    public void updateStocks(Long newStock){
+        this.stock = newStock;
     }
 
 }
