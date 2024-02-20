@@ -1,4 +1,4 @@
-package com.hanghae.module_item.item.dto;
+package com.hanghae.module_item.item.dto.response;
 
 import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;

@@ -1,8 +1,8 @@
 package com.hanghae.module_item.item.controller;
 
-import com.hanghae.module_item.item.dto.CreateItemRequest;
-import com.hanghae.module_item.item.dto.CreateItemResponse;
-import com.hanghae.module_item.item.dto.GetItemResponse;
+import com.hanghae.module_item.item.dto.request.CreateItemRequest;
+import com.hanghae.module_item.item.dto.response.CreateItemResponse;
+import com.hanghae.module_item.item.dto.response.GetItemResponse;
 import com.hanghae.module_item.item.service.ItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

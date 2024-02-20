@@ -1,22 +1,16 @@
-package com.hanghae.module_item.item.dto;
+package com.hanghae.module_item.item.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @ToString
-public class CreateItemRequest {
-    private Long sellerNum;
+public class GetItemResponse {
     private String title;
     private String description;
     private Long price;
-    private Long stock;
-    private LocalDateTime availableAt;
-    private LocalDateTime endAt;
 }
