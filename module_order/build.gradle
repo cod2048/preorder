@@ -11,6 +11,10 @@ java {
     sourceCompatibility = '17'
 }
 
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
 repositories {
     mavenCentral()
 }
@@ -24,6 +28,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     //msa
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {
