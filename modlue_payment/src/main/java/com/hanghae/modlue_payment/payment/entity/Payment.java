@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_num")
-    private Long paymentNum;
-
     @Column(name = "order_num", nullable = false)
     private Long orderNum;
 
