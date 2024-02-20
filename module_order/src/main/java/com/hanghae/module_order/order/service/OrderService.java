@@ -48,7 +48,7 @@ public class OrderService {
         }
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
-            StockResponse originalStocks = itemClient.checkItemStocks(order.getItemNum());
+            StockResponse originalStocks = itemClient.getItemStocks(order.getItemNum());
             ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity());
             StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest);
 

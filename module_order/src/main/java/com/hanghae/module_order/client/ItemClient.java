@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface ItemClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/internal/items/{itemNum}", consumes = "application/json")
-    StockResponse checkItemStocks(@PathVariable("itemNum") Long itemNum);
+    StockResponse getItemStocks(@PathVariable("itemNum") Long itemNum);
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/internal/items", consumes = "application/json")
     StockResponse updateItemStocks(@RequestBody ReduceStockRequest reduceStockRequest);
+
 
 }

@@ -17,7 +17,7 @@ public class InternalItemController {
     }
 
     @GetMapping("/{itemNum}")
-    public ResponseEntity<StockResponse> checkItemStocks(@PathVariable("itemNum") Long itemNum) {
+    public ResponseEntity<StockResponse> getItemStocks(@PathVariable("itemNum") Long itemNum) {
         Long stocks = itemService.getItemStocks(itemNum);
         StockResponse stockResponse = new StockResponse(itemNum, stocks);
 
