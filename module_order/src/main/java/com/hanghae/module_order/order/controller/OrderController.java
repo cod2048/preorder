@@ -1,16 +1,12 @@
 package com.hanghae.module_order.order.controller;
 
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
-import com.hanghae.module_order.order.dto.request.CreateTryPaymentRequest;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -29,9 +25,9 @@ public class OrderController {
         return ResponseEntity.ok().body("order start");
     }
 
-    @PostMapping("/try-payments")
-    public ResponseEntity<?> tryPayment(@RequestBody CreateTryPaymentRequest createTryPaymentRequest) {
-        Order.OrderStatus status = orderService.tryPayment(createTryPaymentRequest);
+    @PostMapping("/try-payments/{orderNum}")
+    public ResponseEntity<?> tryPayment(@PathVariable Long orderNum) {
+        Order.OrderStatus status = orderService.tryPayment(orderNum);
 
         return switch (status) {
             case IN_PROGRESS -> ResponseEntity.ok().body("order in progress");
