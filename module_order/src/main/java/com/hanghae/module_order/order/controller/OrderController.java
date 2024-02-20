@@ -32,6 +32,8 @@ public class OrderController {
         return switch (status) {
             case IN_PROGRESS -> ResponseEntity.ok().body("order in progress");
             case FAILED_CUSTOMER -> ResponseEntity.status(HttpStatus.CONFLICT).body("order failed(customer)");
+            case FAILED_QUANTITY -> ResponseEntity.status(HttpStatus.CONFLICT).body("order failed(not enough stock)");
+            case COMPLETED -> ResponseEntity.ok().body("order success");
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
         };
 
