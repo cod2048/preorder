@@ -13,4 +13,5 @@ public class CreateOrderRequest {
     private Long buyerNum;
     private Long itemNum;
     private Long quantity;
+    private Long price;
 }
