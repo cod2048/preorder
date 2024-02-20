@@ -1,17 +1,20 @@
-package com.hanghae.module_order.order.dto.request;
+package com.hanghae.modlue_payment.payment.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @ToString
-public class CreateOrderRequest {
+public class PaymentDetailsResponse {
+    private Long orderNum;
     private Long buyerNum;
-    private Long itemNum;
     private Long quantity;
     private Long price;
+    private LocalDateTime createdAt;
 }

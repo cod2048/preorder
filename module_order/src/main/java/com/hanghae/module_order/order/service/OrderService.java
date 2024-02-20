@@ -1,6 +1,8 @@
 package com.hanghae.module_order.order.service;
 
 import com.hanghae.module_order.client.ItemClient;
+import com.hanghae.module_order.client.PaymentClient;
+import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
 import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
 import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
@@ -17,10 +19,12 @@ import java.util.Objects;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ItemClient itemClient;
+    private final PaymentClient paymentClient;
 
-    public OrderService(OrderRepository orderRepository, ItemClient itemClient) {
+    public OrderService(OrderRepository orderRepository, ItemClient itemClient, PaymentClient paymentClient) {
         this.orderRepository = orderRepository;
         this.itemClient = itemClient;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional
@@ -29,6 +33,7 @@ public class OrderService {
                 .buyerNum(createOrderRequest.getBuyerNum())
                 .itemNum(createOrderRequest.getItemNum())
                 .quantity(createOrderRequest.getQuantity())
+                .price(createOrderRequest.getPrice())
                 .status(Order.OrderStatus.INITIATED)
                 .build();
 
@@ -48,14 +53,19 @@ public class OrderService {
         }
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
-            StockResponse originalStocks = itemClient.checkItemStocks(order.getItemNum());
+            StockResponse originalStocks = itemClient.getItemStocks(order.getItemNum()); // 원래 재고
             ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity());
-            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest);
+            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest); // 재고 감소
 
             if (Objects.equals(stockResponse.getStock(), originalStocks.getStock())) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
             } else {
                 order.updateStatus(Order.OrderStatus.COMPLETED);
+                log.info("주문성공, 주문상세정보 저장 전");
+                CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest(order.getOrderNum(), order.getBuyerNum(), order.getQuantity(), order.getPrice());
+                log.info("주문성공 createPaymentRequest: {}", createPaymentRequest);
+                paymentClient.createPayment(createPaymentRequest);
+
             }
         }
 

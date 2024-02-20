@@ -1,17 +1,17 @@
-package com.hanghae.module_order.order.dto.request;
+package com.hanghae.module_order.client.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @ToString
-public class CreateOrderRequest {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CreatePaymentRequest {
+    private Long orderNum;
     private Long buyerNum;
-    private Long itemNum;
     private Long quantity;
     private Long price;
 }
