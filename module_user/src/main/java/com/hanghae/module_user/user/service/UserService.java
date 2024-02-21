@@ -67,7 +67,7 @@ public class UserService {
 
     public GetUserRoleResponse getUserRole(Long userNum) {
         User findUser = userRepository.findById(userNum)
-                .orElseThrow(() -> new IllegalArgumentException("user not exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return new GetUserRoleResponse(findUser.getUserNum(), findUser.getUserRole().toString());
     }
