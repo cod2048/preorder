@@ -27,7 +27,7 @@ public class PaymentService {
         return new PaymentDetailsResponse(payment.getOrderNum(), payment.getBuyerNum(), payment.getQuantity(), payment.getPrice(), payment.getCreatedAt());
     }
 
-//    @Transactional
+    @Transactional
     public void createPayment(CreatePaymentRequest createPaymentRequest) {
         log.info("createPayment 서비스 진입");
         log.info("createPaymentRequestId : {}", createPaymentRequest.getOrderNum());
