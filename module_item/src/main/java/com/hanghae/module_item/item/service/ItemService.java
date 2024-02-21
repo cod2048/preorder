@@ -1,5 +1,7 @@
 package com.hanghae.module_item.item.service;
 
+import com.hanghae.module_item.client.UserClient;
+import com.hanghae.module_item.client.dto.GetUserRoleResponse;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
 import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +25,22 @@ import java.util.stream.Collectors;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final StockRepository stockRepository;
+    private final UserClient userClient;
 
-    public ItemService(ItemRepository itemRepository, StockRepository stockRepository) {
+    public ItemService(ItemRepository itemRepository, StockRepository stockRepository, UserClient userClient) {
         this.itemRepository = itemRepository;
         this.stockRepository = stockRepository;
+        this.userClient = userClient;
     }
 
     @Transactional
     public CreateItemResponse create(CreateItemRequest createItemRequest) {
+        GetUserRoleResponse getUserRoleResponse = userClient.getUserRole(createItemRequest.getSellerNum());
+
+        if(!Objects.equals(getUserRoleResponse.getUserRole(), "SELLER")) {
+            throw new IllegalArgumentException("only seller can sell items");
+        }
+
         Item item = Item.builder()
                 .sellerNum(createItemRequest.getSellerNum())
                 .title(createItemRequest.getTitle())
@@ -47,9 +58,7 @@ public class ItemService {
 
         stockRepository.save(stock);
 
-        CreateItemResponse createItemResponse = new CreateItemResponse(newItem, stock);
-
-        return createItemResponse;
+        return new CreateItemResponse(newItem, stock);
     }
 
     @Transactional
