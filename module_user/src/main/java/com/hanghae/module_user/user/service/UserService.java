@@ -2,6 +2,7 @@ package com.hanghae.module_user.user.service;
 
 import com.hanghae.module_user.common.email.EmailService;
 import com.hanghae.module_user.user.dto.request.CreateUserRequest;
+import com.hanghae.module_user.user.dto.response.GetUserRoleResponse;
 import com.hanghae.module_user.user.entity.User;
 import com.hanghae.module_user.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +63,11 @@ public class UserService {
         return redisService.compareValue(userEmail, requestCode);
     }
 
+    public GetUserRoleResponse getUserRole(Long userNum) {
+        User findUser = userRepository.findById(userNum)
+                .orElseThrow(() -> new IllegalArgumentException("user not exist"));
 
-
-
+        return new GetUserRoleResponse(findUser.getUserNum(), findUser.getUserRole().toString());
+    }
 
 }
