@@ -15,7 +15,6 @@ public enum ErrorCode {
     // 5xx
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 있습니다.");
 
-    ;
 
     private final HttpStatus status;
     private final String message;
