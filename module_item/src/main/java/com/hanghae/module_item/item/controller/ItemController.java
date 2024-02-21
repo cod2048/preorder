@@ -2,7 +2,7 @@ package com.hanghae.module_item.item.controller;
 
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
-import com.hanghae.module_item.item.dto.response.GetItemResponse;
+import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
 import com.hanghae.module_item.item.service.ItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemNum}")
-    public ResponseEntity<GetItemResponse> getItemDetails(@PathVariable Long itemNum){
+    public ResponseEntity<ItemDetailsResponse> getItemDetails(@PathVariable Long itemNum){
         return ResponseEntity.ok(itemService.getItemDetails(itemNum));
     }
 
