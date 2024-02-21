@@ -1,6 +1,8 @@
 package com.hanghae.module_user.user.service;
 
 import com.hanghae.module_user.common.email.EmailService;
+import com.hanghae.module_user.common.exception.CustomException;
+import com.hanghae.module_user.common.exception.ErrorCode;
 import com.hanghae.module_user.user.dto.request.CreateUserRequest;
 import com.hanghae.module_user.user.dto.response.GetUserRoleResponse;
 import com.hanghae.module_user.user.entity.User;
@@ -28,16 +30,16 @@ public class UserService {
 
         //필수요소 확인
         if (createUserRequest.getEmail() == null || createUserRequest.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("email is empty");
+            throw new CustomException(ErrorCode.EMAIL_REQUIRED);
         }
         if (createUserRequest.getName() == null || createUserRequest.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
+            throw new CustomException(ErrorCode.NAME_REQUIRED);
         }
         if (createUserRequest.getPassword() == null || createUserRequest.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("password is empty");
+            throw new CustomException(ErrorCode.PASSWORD_REQUIRED);
         }
         if (createUserRequest.getUserRole() == null) {
-            throw new IllegalArgumentException("userRole is empty");
+            throw new CustomException(ErrorCode.USER_ROLE_REQUIRED);
         }
 
         String verificationCode = createUserRequest.getVerificationCode();
