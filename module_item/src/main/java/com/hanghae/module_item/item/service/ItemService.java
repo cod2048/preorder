@@ -5,7 +5,7 @@ import com.hanghae.module_item.client.dto.GetUserRoleResponse;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
 import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
-import com.hanghae.module_item.item.dto.response.GetItemResponse;
+import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
 import com.hanghae.module_item.item.dto.response.StockResponse;
 import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;
@@ -72,11 +72,23 @@ public class ItemService {
     }
 
     @Transactional
-    public GetItemResponse getItemDetails(Long itemNum){
+    public ItemDetailsResponse getItemDetails(Long itemNum){
         Item item = itemRepository.findById(itemNum)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + itemNum));
 
-        return new GetItemResponse(item.getTitle(), item.getDescription(), item.getPrice());
+        Stock stocks = stockRepository.findById(itemNum)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found with id(stock table)" + itemNum));
+
+        return new ItemDetailsResponse(
+                item.getItemNum(),
+                item.getSellerNum(),
+                item.getTitle(),
+                item.getDescription(),
+                item.getPrice(),
+                stocks.getStock(),
+                item.getAvailableAt(),
+                item.getEndAt()
+        );
     }
 
     @Transactional

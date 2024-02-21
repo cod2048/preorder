@@ -4,6 +4,7 @@ import com.hanghae.module_order.client.ItemClient;
 import com.hanghae.module_order.client.PaymentClient;
 import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
 import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
+import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
 import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
 import com.hanghae.module_order.order.entity.Order;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -29,6 +31,14 @@ public class OrderService {
 
     @Transactional
     public void create(CreateOrderRequest createOrderRequest) {
+        ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
+
+        LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
+
+        if(isNotPreOrderItem(availableAt)) {
+            throw new IllegalArgumentException("not available time");
+        }
+
         Order order = Order.builder()
                 .buyerNum(createOrderRequest.getBuyerNum())
                 .itemNum(createOrderRequest.getItemNum())
@@ -45,25 +55,33 @@ public class OrderService {
         Order order = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new IllegalArgumentException("order not exist"));
 
-        double chance = Math.random();
-        if (chance < 0.2) {
+        ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(order.getItemNum()); // 아이템 정보
+
+        double firstChance = Math.random();
+        if (firstChance < 0.2) {
+            order.updateStatus(Order.OrderStatus.CANCELED);
+            return order.getStatus();
+        }
+
+        double secondChance = Math.random();
+        if (secondChance < 0.2) {
             order.updateStatus(Order.OrderStatus.FAILED_CUSTOMER);
         } else {
             order.updateStatus(Order.OrderStatus.IN_PROGRESS);
         }
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
-            StockResponse originalStocks = itemClient.getItemStocks(order.getItemNum()); // 원래 재고
-            ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity());
-            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest); // 재고 감소
+            Long originalStocks = itemDetailsResponse.getStock(); // 현재 재고
+            ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
+            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest); // 재고 감소 결과
 
-            if (Objects.equals(stockResponse.getStock(), originalStocks.getStock())) {
+            if (Objects.equals(stockResponse.getStock(), originalStocks)) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
             } else {
                 order.updateStatus(Order.OrderStatus.COMPLETED);
-                log.info("주문성공, 주문상세정보 저장 전");
+//                log.info("주문성공, 주문상세정보 저장 전");
                 CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest(order.getOrderNum(), order.getBuyerNum(), order.getQuantity(), order.getPrice());
-                log.info("주문성공 createPaymentRequest: {}", createPaymentRequest);
+//                log.info("주문성공 createPaymentRequest: {}", createPaymentRequest);
                 paymentClient.createPayment(createPaymentRequest);
 
             }
@@ -72,5 +90,13 @@ public class OrderService {
         return order.getStatus();
     }
 
+    @Transactional
+    public boolean isNotPreOrderItem(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        return dateTime.isAfter(now);
+    }
 
 }
