@@ -45,8 +45,14 @@ public class OrderService {
         Order order = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new IllegalArgumentException("order not exist"));
 
-        double chance = Math.random();
-        if (chance < 0.2) {
+        double firstChance = Math.random();
+        if (firstChance < 0.2) {
+            order.updateStatus(Order.OrderStatus.CANCELED);
+            return order.getStatus();
+        }
+
+        double secondChance = Math.random();
+        if (secondChance < 0.2) {
             order.updateStatus(Order.OrderStatus.FAILED_CUSTOMER);
         } else {
             order.updateStatus(Order.OrderStatus.IN_PROGRESS);
@@ -61,9 +67,9 @@ public class OrderService {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
             } else {
                 order.updateStatus(Order.OrderStatus.COMPLETED);
-                log.info("주문성공, 주문상세정보 저장 전");
+//                log.info("주문성공, 주문상세정보 저장 전");
                 CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest(order.getOrderNum(), order.getBuyerNum(), order.getQuantity(), order.getPrice());
-                log.info("주문성공 createPaymentRequest: {}", createPaymentRequest);
+//                log.info("주문성공 createPaymentRequest: {}", createPaymentRequest);
                 paymentClient.createPayment(createPaymentRequest);
 
             }
