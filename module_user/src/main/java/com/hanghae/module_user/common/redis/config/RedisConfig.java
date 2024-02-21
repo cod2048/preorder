@@ -1,4 +1,4 @@
-package com.nayoon.user_service.common.redis.config;
+package com.hanghae.module_user.common.redis.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/items")
+@RequestMapping("/api/v1/items")
 public class ItemController {
 
     private final ItemService itemService;

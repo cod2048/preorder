@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/internal/payments")
+@RequestMapping("/api/v1/internal/payments")
 @Slf4j
 public class InternalPaymentController {
     private final PaymentService paymentService;

@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "paymentClient", url = "${feign.paymentClient.url}")
 public interface PaymentClient {
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/internal/payments", consumes = "application/json")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/internal/payments", consumes = "application/json")
     void createPayment(CreatePaymentRequest createPaymentRequest);
 }

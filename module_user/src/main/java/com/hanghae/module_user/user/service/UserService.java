@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final com.hanghae.module_user.redis.service.RedisService redisService;
+    private final com.hanghae.module_user.common.redis.service.RedisService redisService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, com.hanghae.module_user.redis.service.RedisService redisService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, com.hanghae.module_user.common.redis.service.RedisService redisService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.redisService = redisService;

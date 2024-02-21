@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class EmailService {
     private final JavaMailSender mailSender;
-    private final com.hanghae.module_user.redis.service.RedisService redisService;
+    private final com.hanghae.module_user.common.redis.service.RedisService redisService;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private Long timeout;

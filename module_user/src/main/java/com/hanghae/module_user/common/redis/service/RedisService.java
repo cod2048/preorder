@@ -1,4 +1,4 @@
-package com.hanghae.module_user.redis.service;
+package com.hanghae.module_user.common.redis.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
