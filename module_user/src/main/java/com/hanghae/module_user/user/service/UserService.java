@@ -57,7 +57,7 @@ public class UserService {
 
             return createdUser;
         } else {
-            throw new IllegalStateException("verification code not match");
+            throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
         }
     }
 
