@@ -32,7 +32,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void create(CreateOrderRequest createOrderRequest) {
+    public Order create(CreateOrderRequest createOrderRequest) {
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
 
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
@@ -49,7 +49,7 @@ public class OrderService {
                 .status(Order.OrderStatus.INITIATED)
                 .build();
 
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     @Transactional

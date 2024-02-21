@@ -1,9 +1,11 @@
 package com.hanghae.module_user.user.controller;
 
+import com.hanghae.module_user.common.dto.response.ApiResponse;
 import com.hanghae.module_user.user.dto.request.CreateUserRequest;
 import com.hanghae.module_user.user.entity.User;
 import com.hanghae.module_user.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +23,14 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signUp(@RequestBody CreateUserRequest createUserRequest) {
-        return ResponseEntity.ok(userService.create(createUserRequest));
+    public ResponseEntity<ApiResponse<User>> signUp(@RequestBody CreateUserRequest createUserRequest) {
+        User user = userService.create(createUserRequest);
+        ApiResponse<User> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "유저 생성 성공",
+                user
+        );
+        return ResponseEntity.ok(response);
     }
 
 }

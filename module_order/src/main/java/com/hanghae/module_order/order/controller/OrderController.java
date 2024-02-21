@@ -1,5 +1,6 @@
 package com.hanghae.module_order.order.controller;
 
+import com.hanghae.module_order.common.dto.response.ApiResponse;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.service.OrderService;
@@ -20,9 +21,16 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateOrderRequest createOrderRequest) {
-        orderService.create(createOrderRequest);
-        return ResponseEntity.ok().body("order start");
+    public ResponseEntity<ApiResponse<Order>> create(@RequestBody CreateOrderRequest createOrderRequest) {
+        Order newOrder = orderService.create(createOrderRequest);
+
+        ApiResponse<Order> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "주문 진입",
+                newOrder
+        );
+
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/try-payments/{orderNum}")
