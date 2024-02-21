@@ -1,8 +1,10 @@
 package com.hanghae.modlue_payment.payment.controller;
 
+import com.hanghae.modlue_payment.common.dto.response.ApiResponse;
 import com.hanghae.modlue_payment.payment.dto.response.PaymentDetailsResponse;
 import com.hanghae.modlue_payment.payment.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,9 +23,15 @@ public class PaymentController {
     }
 
     @GetMapping("/{orderNum}")
-    public ResponseEntity<PaymentDetailsResponse> getPaymentdetails(@PathVariable Long orderNum){
-
+    public ResponseEntity<ApiResponse<PaymentDetailsResponse>> getPaymentdetails(@PathVariable Long orderNum){
         PaymentDetailsResponse paymentDetailsResponse = paymentService.getPaymentdetails(orderNum);
-        return ResponseEntity.ok().body(paymentDetailsResponse);
+
+        ApiResponse<PaymentDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "주문 정보 조회 결과",
+                paymentDetailsResponse
+        );
+
+        return ResponseEntity.ok().body(response);
     }
 }
