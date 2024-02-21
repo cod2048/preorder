@@ -2,6 +2,8 @@ package com.hanghae.module_item.item.service;
 
 import com.hanghae.module_item.client.UserClient;
 import com.hanghae.module_item.client.dto.GetUserRoleResponse;
+import com.hanghae.module_item.common.exception.CustomException;
+import com.hanghae.module_item.common.exception.ErrorCode;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
 import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
@@ -38,7 +40,7 @@ public class ItemService {
         GetUserRoleResponse getUserRoleResponse = userClient.getUserRole(createItemRequest.getSellerNum());
 
         if(!Objects.equals(getUserRoleResponse.getUserRole(), "SELLER")) {
-            throw new IllegalArgumentException("only seller can sell items");
+            throw new CustomException(ErrorCode.NOT_SELLER);
         }
 
         Item item = Item.builder()
@@ -74,10 +76,10 @@ public class ItemService {
     @Transactional
     public ItemDetailsResponse getItemDetails(Long itemNum){
         Item item = itemRepository.findById(itemNum)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + itemNum));
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
         Stock stocks = stockRepository.findById(itemNum)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found with id(stock table)" + itemNum));
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
 
         return new ItemDetailsResponse(
                 item.getItemNum(),
@@ -94,7 +96,7 @@ public class ItemService {
     @Transactional
     public Long getItemStocks(Long itemNum) {
         Stock stocks = stockRepository.findById(itemNum)
-                .orElseThrow(() -> new EntityNotFoundException("Item not found with id: "  + itemNum));
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
 
         return stocks.getStock();
     }
@@ -107,8 +109,7 @@ public class ItemService {
         Stock itemStock = stockRepository.findAndLockById(itemNum);
 
         if (itemStock == null) {
-            // Null인 경우를 처리하세요, 예를 들어 예외를 던지거나 에러 응답을 반환
-            throw new IllegalArgumentException("cant find item");
+            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
         }
 
         Long currentStock = itemStock.getStock();

@@ -1,5 +1,7 @@
 package com.hanghae.modlue_payment.payment.service;
 
+import com.hanghae.modlue_payment.common.exception.CustomException;
+import com.hanghae.modlue_payment.common.exception.ErrorCode;
 import com.hanghae.modlue_payment.payment.dto.request.CreatePaymentRequest;
 import com.hanghae.modlue_payment.payment.dto.response.PaymentDetailsResponse;
 import com.hanghae.modlue_payment.payment.entity.Payment;
@@ -20,7 +22,7 @@ public class PaymentService {
     @Transactional
     public PaymentDetailsResponse getPaymentdetails(Long orderNum) {
         Payment payment = paymentRepository.findById(orderNum)
-                .orElseThrow(() -> new IllegalArgumentException("order not exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         return new PaymentDetailsResponse(payment.getOrderNum(), payment.getBuyerNum(), payment.getQuantity(), payment.getPrice(), payment.getCreatedAt());
     }
