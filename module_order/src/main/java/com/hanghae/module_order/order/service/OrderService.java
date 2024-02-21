@@ -6,6 +6,8 @@ import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
 import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
 import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
 import com.hanghae.module_order.client.dto.response.StockResponse;
+import com.hanghae.module_order.common.exception.CustomException;
+import com.hanghae.module_order.common.exception.ErrorCode;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.repository.OrderRepository;
@@ -36,7 +38,7 @@ public class OrderService {
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
 
         if(isNotPreOrderItem(availableAt)) {
-            throw new IllegalArgumentException("not available time");
+            throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
         }
 
         Order order = Order.builder()
@@ -53,7 +55,7 @@ public class OrderService {
     @Transactional
     public Order.OrderStatus tryPayment(Long orderNum) {
         Order order = orderRepository.findById(orderNum)
-                .orElseThrow(() -> new IllegalArgumentException("order not exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(order.getItemNum()); // 아이템 정보
 
