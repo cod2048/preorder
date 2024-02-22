@@ -9,6 +9,7 @@ import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.common.exception.CustomException;
 import com.hanghae.module_order.common.exception.ErrorCode;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
+import com.hanghae.module_order.order.dto.response.OrderResponse;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -53,20 +54,14 @@ public class OrderService {
     }
 
     @Transactional
-    public Order.OrderStatus tryPayment(Long orderNum) {
+    public OrderResponse tryPayment(Long orderNum) {
         Order order = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(order.getItemNum()); // 아이템 정보
 
-        double firstChance = Math.random();
-        if (firstChance < 0.2) {
-            order.updateStatus(Order.OrderStatus.CANCELED);
-            return order.getStatus();
-        }
-
-        double secondChance = Math.random();
-        if (secondChance < 0.2) {
+        double chance = Math.random();
+        if (chance < 0.2) {
             order.updateStatus(Order.OrderStatus.FAILED_CUSTOMER);
         } else {
             order.updateStatus(Order.OrderStatus.IN_PROGRESS);
@@ -89,7 +84,7 @@ public class OrderService {
             }
         }
 
-        return order.getStatus();
+        return new OrderResponse(order.getOrderNum(), order.getBuyerNum(), order.getItemNum(), order.getQuantity(), order.getStatus());
     }
 
     @Transactional
