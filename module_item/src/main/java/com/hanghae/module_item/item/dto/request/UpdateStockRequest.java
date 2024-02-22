@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReduceStockRequest {
+public class UpdateStockRequest {
     private Long itemNum;
     private Long quantity;
 }

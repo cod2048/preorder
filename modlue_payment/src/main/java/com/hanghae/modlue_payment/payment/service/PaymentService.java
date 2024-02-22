@@ -1,5 +1,6 @@
 package com.hanghae.modlue_payment.payment.service;
 
+import com.hanghae.modlue_payment.client.OrderClient;
 import com.hanghae.modlue_payment.common.exception.CustomException;
 import com.hanghae.modlue_payment.common.exception.ErrorCode;
 import com.hanghae.modlue_payment.payment.dto.request.CreatePaymentRequest;
@@ -15,8 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    private final OrderClient orderClient;
+
+    public PaymentService(PaymentRepository paymentRepository, OrderClient orderClient) {
         this.paymentRepository = paymentRepository;
+        this.orderClient = orderClient;
     }
 
     public PaymentDetailsResponse getPaymentdetails(Long orderNum) {
@@ -45,6 +49,8 @@ public class PaymentService {
     public void delete(Long paymentNum) {
         Payment targetPayment = paymentRepository.findById(paymentNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        orderClient.cancelOrder(targetPayment.getOrderNum());
 
         targetPayment.delete();
     }

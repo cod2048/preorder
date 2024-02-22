@@ -5,7 +5,7 @@ import com.hanghae.module_item.client.dto.GetUserRoleResponse;
 import com.hanghae.module_item.common.exception.CustomException;
 import com.hanghae.module_item.common.exception.ErrorCode;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
-import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
+import com.hanghae.module_item.item.dto.request.UpdateStockRequest;
 import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
 import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
@@ -14,7 +14,6 @@ import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;
 import com.hanghae.module_item.item.repository.ItemRepository;
 import com.hanghae.module_item.item.repository.StockRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,9 +90,9 @@ public class ItemService {
     }
 
     @Transactional
-    public synchronized StockResponse reduceItemStocks(ReduceStockRequest reduceStockRequest) {
-        Long itemNum = reduceStockRequest.getItemNum();
-        Long quantity = reduceStockRequest.getQuantity();
+    public synchronized StockResponse reduceItemStocks(UpdateStockRequest updateStockRequest) {
+        Long itemNum = updateStockRequest.getItemNum();
+        Long quantity = updateStockRequest.getQuantity();
 
         Stock itemStock = stockRepository.findAndLockById(itemNum);
 
@@ -110,6 +109,22 @@ public class ItemService {
             itemStock.updateStocks(updateStock);
 
         }
+        return new StockResponse(itemNum, itemStock.getStock());
+    }
+
+    @Transactional
+    public synchronized StockResponse increaseItemStocks(UpdateStockRequest updateStockRequest) {
+        Long itemNum = updateStockRequest.getItemNum();
+        Long quantity = updateStockRequest.getQuantity();
+
+        Stock itemStock = stockRepository.findAndLockById(itemNum);
+
+        if (itemStock == null) {
+            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
+        }
+
+        itemStock.updateStocks(itemStock.getStock() + quantity);
+
         return new StockResponse(itemNum, itemStock.getStock());
     }
 

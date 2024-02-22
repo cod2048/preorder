@@ -3,12 +3,13 @@ package com.hanghae.module_order.order.service;
 import com.hanghae.module_order.client.ItemClient;
 import com.hanghae.module_order.client.PaymentClient;
 import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
-import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
+import com.hanghae.module_order.client.dto.request.updateStockRequest;
 import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
 import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.common.exception.CustomException;
 import com.hanghae.module_order.common.exception.ErrorCode;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
+import com.hanghae.module_order.order.dto.response.CancelOrderResponse;
 import com.hanghae.module_order.order.dto.response.OrderResponse;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.repository.OrderRepository;
@@ -65,8 +66,8 @@ public class OrderService {
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
             Long originalStocks = itemDetailsResponse.getStock(); // 현재 재고
-            ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
-            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest); // 재고 감소 결과
+            updateStockRequest updateStockRequest = new updateStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
+            StockResponse stockResponse = itemClient.reduceItemStocks(updateStockRequest); // 재고 감소 결과
 
             if (Objects.equals(stockResponse.getStock(), originalStocks)) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
@@ -99,6 +100,19 @@ public class OrderService {
         targetOrder.delete();
 
         return new OrderResponse(targetOrder.getOrderNum(), targetOrder.getBuyerNum(), targetOrder.getItemNum(), targetOrder.getQuantity(), targetOrder.getStatus());
+    }
+
+    @Transactional
+    public CancelOrderResponse cancelOrder(Long orderNum) {
+        Order targetOrder = orderRepository.findById(orderNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        updateStockRequest updateStockRequest = new updateStockRequest(targetOrder.getItemNum(), targetOrder.getQuantity());
+
+        itemClient.increaseItemStocks(updateStockRequest);
+        targetOrder.updateStatus(Order.OrderStatus.CANCELED);
+
+        return new CancelOrderResponse(targetOrder.getOrderNum(), targetOrder.getStatus().toString());
     }
 
 }
