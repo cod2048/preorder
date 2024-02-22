@@ -1,5 +1,7 @@
 package com.hanghae.module_item.item.entity;
 
+import com.hanghae.module_item.item.dto.request.CreateItemRequest;
+import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -58,6 +60,29 @@ public class Item {
         this.price = price;
         this.availableAt = availableAt;
         this.endAt = endAt;
+    }
+
+    public static Item create(CreateItemRequest createItemRequest) {
+        return Item.builder()
+                .sellerNum(createItemRequest.getSellerNum())
+                .title(createItemRequest.getTitle())
+                .description(createItemRequest.getDescription())
+                .price(createItemRequest.getPrice())
+                .availableAt(createItemRequest.getAvailableAt())
+                .endAt(createItemRequest.getEndAt())
+                .build();
+    }
+
+    public void update(UpdateItemRequest updateItemRequest) {
+        this.title = updateItemRequest.getTitle();
+        this.description = updateItemRequest.getDescription();
+        this.price = updateItemRequest.getPrice();
+        this.availableAt = updateItemRequest.getAvailableAt();
+        this.endAt = updateItemRequest.getEndAt();
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
 }

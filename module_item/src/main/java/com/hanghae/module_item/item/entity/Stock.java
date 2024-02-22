@@ -28,6 +28,13 @@ public class Stock {
         this.stock = stock;
     }
 
+    public static Stock create(Long itemNum, Long stock) {
+        return Stock.builder()
+                .itemNum(itemNum)
+                .stock(stock)
+                .build();
+    }
+
     public void updateStocks(Long newStock){
         this.stock = newStock;
     }

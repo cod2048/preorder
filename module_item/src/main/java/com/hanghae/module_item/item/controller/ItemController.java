@@ -2,6 +2,7 @@ package com.hanghae.module_item.item.controller;
 
 import com.hanghae.module_item.common.dto.response.ApiResponse;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
+import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
 import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
 import com.hanghae.module_item.item.service.ItemService;
@@ -60,8 +61,32 @@ public class ItemController {
     public ResponseEntity<ApiResponse<Long>> getItemStocks(@PathVariable Long itemNum) {
         ApiResponse<Long> response = new ApiResponse<>(
                 HttpStatus.OK,
-                "상품 재고",
+                "상품 재고 : ",
                 itemService.getItemStocks(itemNum)
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{itemNum}")
+    public ResponseEntity<ApiResponse<ItemDetailsResponse>> updateItemDetails(@PathVariable Long itemNum, @RequestBody UpdateItemRequest updateItemRequest) {
+        ItemDetailsResponse itemDetailsResponse = itemService.update(itemNum, updateItemRequest);
+
+        ApiResponse<ItemDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "상품 정보 수정 결과",
+                itemDetailsResponse
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{itemNum}")
+    public ResponseEntity<ApiResponse<ItemDetailsResponse>> delete(@PathVariable Long itemNum) {
+        ItemDetailsResponse itemDetailsResponse = itemService.delete(itemNum);
+
+        ApiResponse<ItemDetailsResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "상품 삭제 성공 : ",
+                itemDetailsResponse
         );
         return ResponseEntity.ok(response);
     }
