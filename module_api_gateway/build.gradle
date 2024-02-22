@@ -26,7 +26,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
 
     //msa
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'

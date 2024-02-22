@@ -1,6 +1,6 @@
 package com.hanghae.module_order.client;
 
-import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
+import com.hanghae.module_order.client.dto.request.updateStockRequest;
 import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
 import com.hanghae.module_order.client.dto.response.StockResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,7 +15,10 @@ public interface ItemClient {
     @RequestMapping(method = RequestMethod.GET, value = "/api/v1/internal/items/{itemNum}", consumes = "application/json")
     ItemDetailsResponse getItemDetails(@PathVariable("itemNum") Long itemNum);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/internal/items", consumes = "application/json")
-    StockResponse updateItemStocks(@RequestBody ReduceStockRequest reduceStockRequest);
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/items/reduce", consumes = "application/json")
+    StockResponse reduceItemStocks(@RequestBody updateStockRequest updateStockRequest);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/items/increase", consumes = "application/json")
+    StockResponse increaseItemStocks(@RequestBody updateStockRequest updateStockRequest);
 
 }

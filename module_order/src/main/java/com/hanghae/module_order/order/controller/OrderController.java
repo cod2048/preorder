@@ -22,13 +22,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Order>> create(@RequestBody CreateOrderRequest createOrderRequest) {
-        Order newOrder = orderService.create(createOrderRequest);
+    public ResponseEntity<ApiResponse<OrderResponse>> create(@RequestBody CreateOrderRequest createOrderRequest) {
+        OrderResponse orderResponse = orderService.create(createOrderRequest);
 
-        ApiResponse<Order> response = new ApiResponse<>(
+        ApiResponse<OrderResponse> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "주문 진입",
-                newOrder
+                orderResponse
         );
 
         return ResponseEntity.ok().body(response);
@@ -45,7 +45,19 @@ public class OrderController {
         );
 
         return ResponseEntity.ok().body(response);
+    }
 
+    @DeleteMapping("/delete/{orderNum}")
+    public ResponseEntity<ApiResponse<OrderResponse>> delete(@PathVariable Long orderNum) {
+        OrderResponse orderResponse = orderService.delete(orderNum);
+
+        ApiResponse<OrderResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "주문 취소 성공",
+                orderResponse
+        );
+
+        return ResponseEntity.ok().body(response);
     }
 
 }

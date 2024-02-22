@@ -3,12 +3,13 @@ package com.hanghae.module_order.order.service;
 import com.hanghae.module_order.client.ItemClient;
 import com.hanghae.module_order.client.PaymentClient;
 import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
-import com.hanghae.module_order.client.dto.request.ReduceStockRequest;
+import com.hanghae.module_order.client.dto.request.updateStockRequest;
 import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
 import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.common.exception.CustomException;
 import com.hanghae.module_order.common.exception.ErrorCode;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
+import com.hanghae.module_order.order.dto.response.CancelOrderResponse;
 import com.hanghae.module_order.order.dto.response.OrderResponse;
 import com.hanghae.module_order.order.entity.Order;
 import com.hanghae.module_order.order.repository.OrderRepository;
@@ -33,24 +34,21 @@ public class OrderService {
     }
 
     @Transactional
-    public Order create(CreateOrderRequest createOrderRequest) {
+    public OrderResponse create(CreateOrderRequest createOrderRequest) {
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
 
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
+        LocalDateTime endAt = itemDetailsResponse.getEndAt();
 
-        if(isNotPreOrderItem(availableAt)) {
+        if(isNotPreOrderTime(availableAt, endAt)) {
             throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
         }
 
-        Order order = Order.builder()
-                .buyerNum(createOrderRequest.getBuyerNum())
-                .itemNum(createOrderRequest.getItemNum())
-                .quantity(createOrderRequest.getQuantity())
-                .price(createOrderRequest.getPrice())
-                .status(Order.OrderStatus.INITIATED)
-                .build();
+        Order order = Order.create(createOrderRequest);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        return new OrderResponse(savedOrder.getOrderNum(), savedOrder.getBuyerNum(), savedOrder.getItemNum(), savedOrder.getQuantity(), savedOrder.getStatus());
     }
 
     @Transactional
@@ -69,8 +67,8 @@ public class OrderService {
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
             Long originalStocks = itemDetailsResponse.getStock(); // 현재 재고
-            ReduceStockRequest reduceStockRequest = new ReduceStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
-            StockResponse stockResponse = itemClient.updateItemStocks(reduceStockRequest); // 재고 감소 결과
+            updateStockRequest updateStockRequest = new updateStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
+            StockResponse stockResponse = itemClient.reduceItemStocks(updateStockRequest); // 재고 감소 결과
 
             if (Objects.equals(stockResponse.getStock(), originalStocks)) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
@@ -87,13 +85,35 @@ public class OrderService {
         return new OrderResponse(order.getOrderNum(), order.getBuyerNum(), order.getItemNum(), order.getQuantity(), order.getStatus());
     }
 
-    @Transactional
-    public boolean isNotPreOrderItem(LocalDateTime dateTime) {
-        if (dateTime == null) {
+    public boolean isNotPreOrderTime(LocalDateTime availableAt, LocalDateTime endAt) {
+        if (availableAt == null) {
             return false;
         }
         LocalDateTime now = LocalDateTime.now();
-        return dateTime.isAfter(now);
+        return !(now.isAfter(availableAt) && now.isBefore(endAt));
+    }
+
+    @Transactional
+    public OrderResponse delete(Long orderNum) {
+        Order targetOrder = orderRepository.findById(orderNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        targetOrder.delete();
+
+        return new OrderResponse(targetOrder.getOrderNum(), targetOrder.getBuyerNum(), targetOrder.getItemNum(), targetOrder.getQuantity(), targetOrder.getStatus());
+    }
+
+    @Transactional
+    public CancelOrderResponse cancelOrder(Long orderNum) {
+        Order targetOrder = orderRepository.findById(orderNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        updateStockRequest updateStockRequest = new updateStockRequest(targetOrder.getItemNum(), targetOrder.getQuantity());
+
+        itemClient.increaseItemStocks(updateStockRequest);
+        targetOrder.updateStatus(Order.OrderStatus.CANCELED);
+
+        return new CancelOrderResponse(targetOrder.getOrderNum(), targetOrder.getStatus().toString());
     }
 
 }

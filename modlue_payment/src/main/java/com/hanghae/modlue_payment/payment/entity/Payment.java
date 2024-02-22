@@ -1,5 +1,6 @@
 package com.hanghae.modlue_payment.payment.entity;
 
+import com.hanghae.modlue_payment.payment.dto.request.CreatePaymentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,6 +42,19 @@ public class Payment {
         this.buyerNum = buyerNum;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    public static Payment create(CreatePaymentRequest createPaymentRequest) {
+        return Payment.builder()
+                .orderNum(createPaymentRequest.getOrderNum())
+                .buyerNum(createPaymentRequest.getBuyerNum())
+                .quantity(createPaymentRequest.getQuantity())
+                .price(createPaymentRequest.getPrice())
+                .build();
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
 }

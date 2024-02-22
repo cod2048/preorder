@@ -5,7 +5,8 @@ import com.hanghae.module_item.client.dto.GetUserRoleResponse;
 import com.hanghae.module_item.common.exception.CustomException;
 import com.hanghae.module_item.common.exception.ErrorCode;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
-import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
+import com.hanghae.module_item.item.dto.request.UpdateStockRequest;
+import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
 import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
 import com.hanghae.module_item.item.dto.response.StockResponse;
@@ -13,7 +14,6 @@ import com.hanghae.module_item.item.entity.Item;
 import com.hanghae.module_item.item.entity.Stock;
 import com.hanghae.module_item.item.repository.ItemRepository;
 import com.hanghae.module_item.item.repository.StockRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,27 +43,17 @@ public class ItemService {
             throw new CustomException(ErrorCode.NOT_SELLER);
         }
 
-        Item item = Item.builder()
-                .sellerNum(createItemRequest.getSellerNum())
-                .title(createItemRequest.getTitle())
-                .description(createItemRequest.getDescription())
-                .price(createItemRequest.getPrice())
-                .availableAt(createItemRequest.getAvailableAt())
-                .endAt(createItemRequest.getEndAt())
-                .build();
+        Item newitem = Item.create(createItemRequest);
 
-        Item newItem = itemRepository.save(item);
-        Stock stock = Stock.builder()
-                .itemNum(newItem.getItemNum())
-                .stock(createItemRequest.getStock())
-                .build();
+        Item savedItem = itemRepository.save(newitem);
 
-        stockRepository.save(stock);
+        Stock stock = Stock.create(savedItem.getItemNum(), createItemRequest.getStock());
 
-        return new CreateItemResponse(newItem, stock);
+        Stock savedStock = stockRepository.save(stock);
+
+        return new CreateItemResponse(savedItem, savedStock);
     }
 
-    @Transactional
     public List<String> getAllItems(){
         List<String> titles = itemRepository.findAllByDeletedAtIsNull()
                 .stream()
@@ -73,7 +63,6 @@ public class ItemService {
         return titles;
     }
 
-    @Transactional
     public ItemDetailsResponse getItemDetails(Long itemNum){
         Item item = itemRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
@@ -93,7 +82,6 @@ public class ItemService {
         );
     }
 
-    @Transactional
     public Long getItemStocks(Long itemNum) {
         Stock stocks = stockRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
@@ -102,9 +90,9 @@ public class ItemService {
     }
 
     @Transactional
-    public synchronized StockResponse reduceItemStocks(ReduceStockRequest reduceStockRequest) {
-        Long itemNum = reduceStockRequest.getItemNum();
-        Long quantity = reduceStockRequest.getQuantity();
+    public synchronized StockResponse reduceItemStocks(UpdateStockRequest updateStockRequest) {
+        Long itemNum = updateStockRequest.getItemNum();
+        Long quantity = updateStockRequest.getQuantity();
 
         Stock itemStock = stockRepository.findAndLockById(itemNum);
 
@@ -124,4 +112,52 @@ public class ItemService {
         return new StockResponse(itemNum, itemStock.getStock());
     }
 
+    @Transactional
+    public synchronized StockResponse increaseItemStocks(UpdateStockRequest updateStockRequest) {
+        Long itemNum = updateStockRequest.getItemNum();
+        Long quantity = updateStockRequest.getQuantity();
+
+        Stock itemStock = stockRepository.findAndLockById(itemNum);
+
+        if (itemStock == null) {
+            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
+        }
+
+        itemStock.updateStocks(itemStock.getStock() + quantity);
+
+        return new StockResponse(itemNum, itemStock.getStock());
+    }
+
+    @Transactional
+    public ItemDetailsResponse update(Long itemNum, UpdateItemRequest updateItemRequest) {
+        Item targetItem = itemRepository.findById(itemNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        targetItem.update(updateItemRequest);
+
+        return new ItemDetailsResponse(targetItem.getItemNum(), targetItem.getSellerNum(), targetItem.getTitle(), targetItem.getDescription(), targetItem.getPrice(), targetStock.getStock(), targetItem.getAvailableAt(), targetItem.getEndAt());
+    }
+
+    @Transactional
+    public ItemDetailsResponse delete(Long itemNum) {
+        Item targetItem = itemRepository.findById(itemNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        targetItem.delete();
+
+        return new ItemDetailsResponse(
+                targetItem.getItemNum(),
+                targetItem.getSellerNum(),
+                targetItem.getTitle(),
+                targetItem.getDescription(),
+                targetItem.getPrice(),
+                targetStock.getStock(),
+                targetItem.getAvailableAt(),
+                targetItem.getEndAt()
+        );
+    }
 }

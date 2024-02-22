@@ -1,5 +1,6 @@
 package com.hanghae.module_order.order.entity;
 
+import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -55,6 +56,16 @@ public class Order {
         this.status = status;
     }
 
+    public static Order create(CreateOrderRequest createOrderRequest) {
+        return Order.builder()
+                .buyerNum(createOrderRequest.getBuyerNum())
+                .itemNum(createOrderRequest.getItemNum())
+                .quantity(createOrderRequest.getQuantity())
+                .price(createOrderRequest.getPrice())
+                .status(OrderStatus.INITIATED)
+                .build();
+    }
+
     public enum OrderStatus {
         INITIATED,
         IN_PROGRESS,
@@ -66,6 +77,10 @@ public class Order {
 
     public void updateStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public void delete() {
+        this.status = OrderStatus.CANCELED;
     }
 
 }

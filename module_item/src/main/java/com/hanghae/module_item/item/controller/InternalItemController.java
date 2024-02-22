@@ -1,6 +1,6 @@
 package com.hanghae.module_item.item.controller;
 
-import com.hanghae.module_item.item.dto.request.ReduceStockRequest;
+import com.hanghae.module_item.item.dto.request.UpdateStockRequest;
 import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
 import com.hanghae.module_item.item.dto.response.StockResponse;
 import com.hanghae.module_item.item.service.ItemService;
@@ -25,9 +25,15 @@ public class InternalItemController {
         return ResponseEntity.ok(itemDetailsResponse);
     }
 
-    @PostMapping
-    public ResponseEntity<StockResponse> reduceItemStocks(@RequestBody ReduceStockRequest reduceStockRequest) {
-        StockResponse stockResponse = itemService.reduceItemStocks(reduceStockRequest);
+    @PutMapping("/reduce")
+    public ResponseEntity<StockResponse> reduceItemStocks(@RequestBody UpdateStockRequest updateStockRequest) {
+        StockResponse stockResponse = itemService.reduceItemStocks(updateStockRequest);
+        return ResponseEntity.ok(stockResponse);
+    }
+
+    @PutMapping("/increase")
+    public ResponseEntity<StockResponse> increaseItemStocks(@RequestBody UpdateStockRequest updateStockRequest) {
+        StockResponse stockResponse = itemService.increaseItemStocks(updateStockRequest);
         return ResponseEntity.ok(stockResponse);
     }
 }
