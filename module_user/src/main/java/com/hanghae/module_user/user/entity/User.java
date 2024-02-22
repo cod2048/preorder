@@ -1,11 +1,13 @@
 package com.hanghae.module_user.user.entity;
 
 import com.hanghae.module_user.user.dto.request.CreateUserRequest;
+import com.hanghae.module_user.user.dto.request.UpdateUserRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.sql.Update;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -64,8 +66,8 @@ public class User {
                 .build();
     }
 
-    public void update(String name) {
-        this.name = name;
+    public void update(String newName) {
+        this.name = newName;
     }
 
     public void updatePassword(String newPassword) {

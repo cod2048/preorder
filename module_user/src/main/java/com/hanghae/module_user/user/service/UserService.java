@@ -4,7 +4,10 @@ import com.hanghae.module_user.common.email.EmailService;
 import com.hanghae.module_user.common.exception.CustomException;
 import com.hanghae.module_user.common.exception.ErrorCode;
 import com.hanghae.module_user.user.dto.request.CreateUserRequest;
+import com.hanghae.module_user.user.dto.request.UpdatePasswordRequest;
+import com.hanghae.module_user.user.dto.request.UpdateUserRequest;
 import com.hanghae.module_user.user.dto.response.GetUserRoleResponse;
+import com.hanghae.module_user.user.dto.response.UserResponse;
 import com.hanghae.module_user.user.entity.User;
 import com.hanghae.module_user.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,7 @@ public class UserService {
     }
 
     @Transactional
-    public User create(CreateUserRequest createUserRequest) {
+    public UserResponse create(CreateUserRequest createUserRequest) {
 
         //필수요소 확인
         if (createUserRequest.getEmail() == null || createUserRequest.getEmail().trim().isEmpty()) {
@@ -55,7 +58,7 @@ public class UserService {
 
             redisService.deleteValue(userEmail);
 
-            return createdUser;
+            return new UserResponse(createdUser.getUserNum(), createdUser.getName(), createdUser.getEmail());
         } else {
             throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
         }
@@ -72,4 +75,35 @@ public class UserService {
         return new GetUserRoleResponse(findUser.getUserNum(), findUser.getUserRole().toString());
     }
 
+    @Transactional
+    public UserResponse update(Long userNum, UpdateUserRequest updateUserRequest) {
+        User targetUser = userRepository.findById(userNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        targetUser.update(updateUserRequest.getName());
+
+        return new UserResponse(targetUser.getUserNum(), targetUser.getName(), targetUser.getEmail());
+    }
+
+    @Transactional
+    public UserResponse delete(Long userNum) {
+        User targetUser = userRepository.findById(userNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        targetUser.delete();
+
+        return new UserResponse(targetUser.getUserNum(), targetUser.getName(), targetUser.getEmail());
+    }
+
+    @Transactional
+    public UserResponse updatePassword(Long userNum, UpdatePasswordRequest updatePasswordRequest) {
+        User targetUser = userRepository.findById(userNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String encodedNewPassword = bCryptPasswordEncoder.encode(updatePasswordRequest.getPassword());
+
+        targetUser.updatePassword(encodedNewPassword);
+
+        return new UserResponse(targetUser.getUserNum(), targetUser.getName(), targetUser.getEmail());
+    }
 }
