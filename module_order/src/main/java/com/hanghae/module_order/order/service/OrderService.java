@@ -38,8 +38,9 @@ public class OrderService {
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
 
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
+        LocalDateTime endAt = itemDetailsResponse.getEndAt();
 
-        if(isNotPreOrderItem(availableAt)) {
+        if(isNotPreOrderTime(availableAt, endAt)) {
             throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
         }
 
@@ -84,12 +85,12 @@ public class OrderService {
         return new OrderResponse(order.getOrderNum(), order.getBuyerNum(), order.getItemNum(), order.getQuantity(), order.getStatus());
     }
 
-    public boolean isNotPreOrderItem(LocalDateTime dateTime) {
-        if (dateTime == null) {
+    public boolean isNotPreOrderTime(LocalDateTime availableAt, LocalDateTime endAt) {
+        if (availableAt == null) {
             return false;
         }
         LocalDateTime now = LocalDateTime.now();
-        return dateTime.isAfter(now);
+        return !(now.isAfter(availableAt) && now.isBefore(endAt));
     }
 
     @Transactional
