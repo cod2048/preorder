@@ -19,7 +19,6 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Transactional
     public PaymentDetailsResponse getPaymentdetails(Long orderNum) {
         Payment payment = paymentRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
@@ -32,12 +31,7 @@ public class PaymentService {
         log.info("createPayment 서비스 진입");
         log.info("createPaymentRequestId : {}", createPaymentRequest.getOrderNum());
 
-        Payment payment = Payment.builder()
-                .orderNum(createPaymentRequest.getOrderNum())
-                .buyerNum(createPaymentRequest.getBuyerNum())
-                .quantity(createPaymentRequest.getQuantity())
-                .price(createPaymentRequest.getPrice())
-                .build();
+        Payment payment = Payment.create(createPaymentRequest);
 
         log.info("payment 생성 : {}", payment);
         log.info("payment id : {}", payment.getOrderNum());
@@ -45,5 +39,13 @@ public class PaymentService {
         Payment newPayment = paymentRepository.save(payment);
 
         log.info("payment 저장 : {}", newPayment);
+    }
+
+    @Transactional
+    public void delete(Long paymentNum) {
+        Payment targetPayment = paymentRepository.findById(paymentNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        targetPayment.delete();
     }
 }
