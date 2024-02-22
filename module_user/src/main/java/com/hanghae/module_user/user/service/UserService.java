@@ -98,6 +98,10 @@ public class UserService {
         User targetUser = userRepository.findById(userNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        if (targetUser.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_USER);
+        }
+
         targetUser.delete();
 
         return new UserResponse(targetUser.getUserNum(), targetUser.getName(), targetUser.getEmail());
