@@ -56,6 +56,10 @@ public class OrderService {
         Order order = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (order.getStatus().equals(Order.OrderStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.CANCELED_ORDER);
+        }
+
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(order.getItemNum()); // 아이템 정보
 
         double chance = Math.random();
