@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  db_pre_order_user:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_user
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_user:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      - hanghae_network
+
+  db_pre_order_item:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_item
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_item:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+
+  db_pre_order_order:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_order
+    ports:
+      - "3308:3306"
+    volumes:
+      - db_order:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+
+  db_pre_order_payment:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_payment
+    ports:
+      - "3309:3306"
+    volumes:
+      - db_payment:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+
+  redis:
+    hostname: redis
+    container_name: redis
+    image: redis:6
+    ports:
+      - "6379:6379"
+    networks:
+      - hanghae_network
+
+volumes:
+  db_user:
+  db_item:
+  db_order:
+  db_payment:
+
+networks:
+  hanghae_network:
