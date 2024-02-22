@@ -56,6 +56,10 @@ public class OrderService {
         Order order = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (order.getStatus().equals(Order.OrderStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.CANCELED_ORDER);
+        }
+
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(order.getItemNum()); // 아이템 정보
 
         double chance = Math.random();
@@ -98,6 +102,10 @@ public class OrderService {
         Order targetOrder = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (targetOrder.getStatus().equals(Order.OrderStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.CANCELED_ORDER);
+        }
+
         targetOrder.delete();
 
         return new OrderResponse(targetOrder.getOrderNum(), targetOrder.getBuyerNum(), targetOrder.getItemNum(), targetOrder.getQuantity(), targetOrder.getStatus());
@@ -107,6 +115,10 @@ public class OrderService {
     public CancelOrderResponse cancelOrder(Long orderNum) {
         Order targetOrder = orderRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (targetOrder.getStatus().equals(Order.OrderStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.CANCELED_ORDER);
+        }
 
         updateStockRequest updateStockRequest = new updateStockRequest(targetOrder.getItemNum(), targetOrder.getQuantity());
 

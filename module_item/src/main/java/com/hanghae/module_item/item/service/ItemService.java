@@ -67,6 +67,10 @@ public class ItemService {
         Item item = itemRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
+        if (item.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_ITEM);
+        }
+
         Stock stocks = stockRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
 
@@ -94,6 +98,13 @@ public class ItemService {
         Long itemNum = updateStockRequest.getItemNum();
         Long quantity = updateStockRequest.getQuantity();
 
+        Item targetItem = itemRepository.findById(itemNum)
+                .orElseThrow(()-> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        if (targetItem.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_ITEM);
+        }
+
         Stock itemStock = stockRepository.findAndLockById(itemNum);
 
         if (itemStock == null) {
@@ -117,6 +128,13 @@ public class ItemService {
         Long itemNum = updateStockRequest.getItemNum();
         Long quantity = updateStockRequest.getQuantity();
 
+        Item targetItem = itemRepository.findById(itemNum)
+                .orElseThrow(()-> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        if (targetItem.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_ITEM);
+        }
+
         Stock itemStock = stockRepository.findAndLockById(itemNum);
 
         if (itemStock == null) {
@@ -133,6 +151,10 @@ public class ItemService {
         Item targetItem = itemRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
+        if (targetItem.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_ITEM);
+        }
+
         Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
         targetItem.update(updateItemRequest);
@@ -144,6 +166,10 @@ public class ItemService {
     public ItemDetailsResponse delete(Long itemNum) {
         Item targetItem = itemRepository.findById(itemNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        if (targetItem.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_ITEM);
+        }
 
         Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 

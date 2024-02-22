@@ -27,6 +27,10 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(orderNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (payment.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_PAYMENT);
+        }
+
         return new PaymentDetailsResponse(payment.getOrderNum(), payment.getBuyerNum(), payment.getQuantity(), payment.getPrice(), payment.getCreatedAt());
     }
 
@@ -49,6 +53,10 @@ public class PaymentService {
     public void delete(Long paymentNum) {
         Payment targetPayment = paymentRepository.findById(paymentNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        if(targetPayment.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_PAYMENT);
+        }
 
         orderClient.cancelOrder(targetPayment.getOrderNum());
 
