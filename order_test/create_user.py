@@ -8,7 +8,7 @@ def create_users(num_buyers=10000, num_sellers=2):
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            database='pre_order',
+            database='pre_order_user',
             user='hanghae',
             password='hanghae'
         )
