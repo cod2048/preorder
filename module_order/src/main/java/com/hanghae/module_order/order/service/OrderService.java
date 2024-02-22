@@ -33,7 +33,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Order create(CreateOrderRequest createOrderRequest) {
+    public OrderResponse create(CreateOrderRequest createOrderRequest) {
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
 
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
@@ -42,15 +42,11 @@ public class OrderService {
             throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
         }
 
-        Order order = Order.builder()
-                .buyerNum(createOrderRequest.getBuyerNum())
-                .itemNum(createOrderRequest.getItemNum())
-                .quantity(createOrderRequest.getQuantity())
-                .price(createOrderRequest.getPrice())
-                .status(Order.OrderStatus.INITIATED)
-                .build();
+        Order order = Order.create(createOrderRequest);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        return new OrderResponse(savedOrder.getOrderNum(), savedOrder.getBuyerNum(), savedOrder.getItemNum(), savedOrder.getQuantity(), savedOrder.getStatus());
     }
 
     @Transactional
@@ -87,13 +83,22 @@ public class OrderService {
         return new OrderResponse(order.getOrderNum(), order.getBuyerNum(), order.getItemNum(), order.getQuantity(), order.getStatus());
     }
 
-    @Transactional
     public boolean isNotPreOrderItem(LocalDateTime dateTime) {
         if (dateTime == null) {
             return false;
         }
         LocalDateTime now = LocalDateTime.now();
         return dateTime.isAfter(now);
+    }
+
+    @Transactional
+    public OrderResponse delete(Long orderNum) {
+        Order targetOrder = orderRepository.findById(orderNum)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        targetOrder.delete();
+
+        return new OrderResponse(targetOrder.getOrderNum(), targetOrder.getBuyerNum(), targetOrder.getItemNum(), targetOrder.getQuantity(), targetOrder.getStatus());
     }
 
 }
