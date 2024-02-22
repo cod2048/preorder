@@ -72,6 +72,10 @@ public class UserService {
         User findUser = userRepository.findById(userNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        if (findUser.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_USER);
+        }
+
         return new GetUserRoleResponse(findUser.getUserNum(), findUser.getUserRole().toString());
     }
 
@@ -79,6 +83,10 @@ public class UserService {
     public UserResponse update(Long userNum, UpdateUserRequest updateUserRequest) {
         User targetUser = userRepository.findById(userNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (targetUser.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_USER);
+        }
 
         targetUser.update(updateUserRequest.getName());
 
@@ -99,6 +107,10 @@ public class UserService {
     public UserResponse updatePassword(Long userNum, UpdatePasswordRequest updatePasswordRequest) {
         User targetUser = userRepository.findById(userNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (targetUser.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.DELETED_USER);
+        }
 
         String encodedNewPassword = bCryptPasswordEncoder.encode(updatePasswordRequest.getPassword());
 
