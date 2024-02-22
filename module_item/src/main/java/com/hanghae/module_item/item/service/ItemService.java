@@ -159,7 +159,15 @@ public class ItemService {
 
         targetItem.update(updateItemRequest);
 
-        return new ItemDetailsResponse(targetItem.getItemNum(), targetItem.getSellerNum(), targetItem.getTitle(), targetItem.getDescription(), targetItem.getPrice(), targetStock.getStock(), targetItem.getAvailableAt(), targetItem.getEndAt());
+        return new ItemDetailsResponse(
+                targetItem.getItemNum(),
+                targetItem.getSellerNum(),
+                targetItem.getTitle(),
+                targetItem.getDescription(),
+                targetItem.getPrice(),
+                targetStock.getStock(),
+                targetItem.getAvailableAt(),
+                targetItem.getEndAt());
     }
 
     @Transactional
@@ -173,6 +181,8 @@ public class ItemService {
 
         Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
+        stockRepository.delete(targetStock);
+
         targetItem.delete();
 
         return new ItemDetailsResponse(
@@ -181,7 +191,7 @@ public class ItemService {
                 targetItem.getTitle(),
                 targetItem.getDescription(),
                 targetItem.getPrice(),
-                targetStock.getStock(),
+                0L,
                 targetItem.getAvailableAt(),
                 targetItem.getEndAt()
         );
