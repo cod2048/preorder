@@ -15,7 +15,7 @@ def send_http_request(buyerNum):
 
     try:
         # POST 요청을 보냄
-        response = requests.post(order_url, json={"buyerNum": buyerNum, "itemNum": 2, "quantity": 1, "price": 1000})
+        response = requests.post(order_url, json={"buyerNum": buyerNum, "itemNum": 1, "quantity": 1, "price": 1000})
         print(f"Request to {order_url} with buyerNum {buyerNum} completed with status code {response.status_code}")
 
         # 응답을 JSON 형식으로 파싱
@@ -42,7 +42,7 @@ def send_http_request(buyerNum):
 
 def main():
     # Set the number of concurrent requests (N)
-    num_requests = 10000  # buyerNum을 1부터 10000까지 보낼 것이므로 요청 수를 10000으로 설정
+    num_requests = 100  # buyerNum을 1부터 10000까지 보낼 것이므로 요청 수를 10000으로 설정
 
     start_time = datetime.now()  # 코드 실행 시작 시간
 
