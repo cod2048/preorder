@@ -76,7 +76,7 @@ public class OrderService {
             StockDto stockRequest = new StockDto(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
             StockDto stockResponse = stockClient.reduceStocks(order.getItemNum(), stockRequest); // 재고 감소 결과
 
-            if (Objects.equals(stockResponse.getStock(), originalStocks)) {
+            if (Objects.equals(stockResponse.getStock(), null)) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
             } else {
                 order.updateStatus(Order.OrderStatus.COMPLETED);

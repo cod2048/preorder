@@ -73,7 +73,7 @@ public class StockService {
         Long originalStock = targetStock.getStock();
 
         if (originalStock - requestDto.getStock() < 0L) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_STOCK);
+            return new StockDto(targetStock.getItemNum(), null);
         }
 
         targetStock.updateStocks(originalStock - requestDto.getStock());
