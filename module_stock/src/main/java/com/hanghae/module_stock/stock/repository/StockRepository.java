@@ -1,6 +1,6 @@
-package com.hanghae.module_item.item.repository;
+package com.hanghae.module_stock.stock.repository;
 
-import com.hanghae.module_item.item.entity.Stock;
+import com.hanghae.module_stock.stock.entity.Stock;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

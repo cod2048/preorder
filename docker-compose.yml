@@ -13,7 +13,7 @@ services:
       - ./mysql-init:/docker-entrypoint-initdb.d
     restart: always
     networks:
-      - hanghae_network
+      - user_network
 
   db_pre_order_item:
     image: mysql
@@ -51,20 +51,46 @@ services:
       - ./mysql-init:/docker-entrypoint-initdb.d
     restart: always
 
-  redis:
-    hostname: redis
-    container_name: redis
+  db_pre_order_stock:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pre_order_stock
+    ports:
+      - "3310:3306"
+    volumes:
+      - db_stock:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      - stock_network
+
+  redis_user:
+    hostname: redis_user
+    container_name: redis_user
     image: redis:6
     ports:
       - "6379:6379"
     networks:
-      - hanghae_network
+      - user_network
+
+  redis_stock:
+    hostname: redis_stock
+    container_name: redis_stock
+    image: redis:6
+    ports:
+      - "6380:6379"
+    networks:
+      - stock_network
 
 volumes:
   db_user:
   db_item:
   db_order:
   db_payment:
+  db_stock:
 
 networks:
-  hanghae_network:
+  user_network:
+  stock_network:
+

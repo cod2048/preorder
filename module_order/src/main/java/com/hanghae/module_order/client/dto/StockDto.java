@@ -1,15 +1,15 @@
-package com.hanghae.module_order.client.dto.response;
+package com.hanghae.module_order.client.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
 @ToString
-public class StockResponse {
+@Getter
+public class StockDto {
     private Long itemNum;
     private Long stock;
 }

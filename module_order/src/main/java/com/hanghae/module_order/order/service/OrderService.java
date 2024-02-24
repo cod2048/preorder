@@ -2,10 +2,10 @@ package com.hanghae.module_order.order.service;
 
 import com.hanghae.module_order.client.ItemClient;
 import com.hanghae.module_order.client.PaymentClient;
+import com.hanghae.module_order.client.StockClient;
+import com.hanghae.module_order.client.dto.StockDto;
 import com.hanghae.module_order.client.dto.request.CreatePaymentRequest;
-import com.hanghae.module_order.client.dto.request.updateStockRequest;
 import com.hanghae.module_order.client.dto.response.ItemDetailsResponse;
-import com.hanghae.module_order.client.dto.response.StockResponse;
 import com.hanghae.module_order.common.exception.CustomException;
 import com.hanghae.module_order.common.exception.ErrorCode;
 import com.hanghae.module_order.order.dto.request.CreateOrderRequest;
@@ -26,11 +26,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ItemClient itemClient;
     private final PaymentClient paymentClient;
+    private final StockClient stockClient;
 
-    public OrderService(OrderRepository orderRepository, ItemClient itemClient, PaymentClient paymentClient) {
+    public OrderService(OrderRepository orderRepository, ItemClient itemClient, PaymentClient paymentClient, StockClient stockClient) {
         this.orderRepository = orderRepository;
         this.itemClient = itemClient;
         this.paymentClient = paymentClient;
+        this.stockClient = stockClient;
     }
 
     @Transactional
@@ -71,8 +73,8 @@ public class OrderService {
 
         if (order.getStatus() == Order.OrderStatus.IN_PROGRESS) {
             Long originalStocks = itemDetailsResponse.getStock(); // 현재 재고
-            updateStockRequest updateStockRequest = new updateStockRequest(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
-            StockResponse stockResponse = itemClient.reduceItemStocks(updateStockRequest); // 재고 감소 결과
+            StockDto stockRequest = new StockDto(order.getItemNum(), order.getQuantity()); // 재고 감소 요청
+            StockDto stockResponse = stockClient.reduceStocks(order.getItemNum(), stockRequest); // 재고 감소 결과
 
             if (Objects.equals(stockResponse.getStock(), originalStocks)) {
                 order.updateStatus(Order.OrderStatus.FAILED_QUANTITY);
@@ -120,9 +122,9 @@ public class OrderService {
             throw new CustomException(ErrorCode.CANCELED_ORDER);
         }
 
-        updateStockRequest updateStockRequest = new updateStockRequest(targetOrder.getItemNum(), targetOrder.getQuantity());
+        StockDto stockRequest = new StockDto(targetOrder.getItemNum(), targetOrder.getQuantity());
 
-        itemClient.increaseItemStocks(updateStockRequest);
+        stockClient.increaseStocks(targetOrder.getItemNum(), stockRequest);
         targetOrder.updateStatus(Order.OrderStatus.CANCELED);
 
         return new CancelOrderResponse(targetOrder.getOrderNum(), targetOrder.getStatus().toString());

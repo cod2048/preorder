@@ -1,17 +1,14 @@
-package com.hanghae.module_item.item.entity;
+package com.hanghae.module_stock.stock.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Stock {
@@ -38,5 +35,4 @@ public class Stock {
     public void updateStocks(Long newStock){
         this.stock = newStock;
     }
-
 }

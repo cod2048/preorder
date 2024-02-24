@@ -30,15 +30,11 @@ def insert_products():
             VALUES (%s, %s, %s, %s, %s, %s)
             """
             available_at = datetime(2024, 2, 22, 7, 0, 0)
-            end_at = available_at + timedelta(hours=2)
+            # end_at = available_at + timedelta(hours=2)
+            end_at = datetime(2025, 2, 22, 7, 0, 0)
             pre_order_product_values = (10002, '예약 상품', '예약 상품 설명', 15000, available_at, end_at)
             cursor.execute(pre_order_product_query, pre_order_product_values)
             pre_order_product_id = cursor.lastrowid
-
-            # 재고 등록
-            stock_query = "INSERT INTO stock (item_num, stock) VALUES (%s, %s)"
-            cursor.execute(stock_query, (normal_product_id, 10))
-            cursor.execute(stock_query, (pre_order_product_id, 10))
 
             connection.commit()
 
