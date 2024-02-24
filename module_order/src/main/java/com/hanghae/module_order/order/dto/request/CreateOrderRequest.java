@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -13,5 +15,5 @@ public class CreateOrderRequest {
     private Long buyerNum;
     private Long itemNum;
     private Long quantity;
-    private Long price;
+    private BigDecimal price;
 }

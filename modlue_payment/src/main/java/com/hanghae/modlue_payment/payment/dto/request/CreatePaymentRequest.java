@@ -11,7 +11,4 @@ import lombok.ToString;
 @NoArgsConstructor
 public class CreatePaymentRequest {
     private Long orderNum;
-    private Long buyerNum;
-    private Long quantity;
-    private Long price;
 }

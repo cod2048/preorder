@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,7 +34,7 @@ public class Item {
     private String description;
 
     @Column(name = "price", nullable = false)
-    private Long price;
+    private BigDecimal price;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -53,7 +54,7 @@ public class Item {
     private LocalDateTime endAt;
 
     @Builder
-    public Item(Long sellerNum, String title, String description, Long price, LocalDateTime availableAt, LocalDateTime endAt) {
+    public Item(Long sellerNum, String title, String description, BigDecimal price, LocalDateTime availableAt, LocalDateTime endAt) {
         this.sellerNum = sellerNum;
         this.title = title;
         this.description = description;

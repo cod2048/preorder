@@ -14,13 +14,13 @@ public interface StockClient {
     StockDto getStocks(@PathVariable("itemNum") Long itemNum);
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/v1/internal/stocks", consumes = "application/json")
-    StockDto createStocks(@RequestBody StockDto stockDto);
+    StockDto createStocks(@RequestBody StockDto requestDto);
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/stocks/reduce/{itemNum}", consumes = "application/json")
-    StockDto reduceStocks(@PathVariable(name = "itemNum") Long itemNum ,@RequestBody StockDto stockDto);
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/stocks/increase", consumes = "application/json")
+    StockDto increaseStocks(@RequestBody StockDto requestDto);
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/stocks/increase/{itemNum}", consumes = "application/json")
-    StockDto increaseStocks(@PathVariable(name = "itemNum") Long itemNum ,@RequestBody StockDto stockDto);
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/v1/internal/stocks/reduce", consumes = "application/json")
+    StockDto reduceStocks(@RequestBody StockDto requestDto);
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/v1/internal/stocks/{itemNum}", consumes = "application/json")
     void deleteStocks(@PathVariable("itemNum") Long itemNum);

@@ -1,6 +1,8 @@
 package com.hanghae.modlue_payment.payment.service;
 
 import com.hanghae.modlue_payment.client.OrderClient;
+import com.hanghae.modlue_payment.client.dto.response.OrderResponse;
+import com.hanghae.modlue_payment.common.enums.OrderStatus;
 import com.hanghae.modlue_payment.common.exception.CustomException;
 import com.hanghae.modlue_payment.common.exception.ErrorCode;
 import com.hanghae.modlue_payment.payment.dto.request.CreatePaymentRequest;
@@ -31,23 +33,45 @@ public class PaymentService {
             throw new CustomException(ErrorCode.DELETED_PAYMENT);
         }
 
-        return new PaymentDetailsResponse(payment.getOrderNum(), payment.getBuyerNum(), payment.getQuantity(), payment.getPrice(), payment.getCreatedAt());
+        return new PaymentDetailsResponse(
+                payment.getPaymentNum(),
+                payment.getOrderNum(),
+                payment.getBuyerNum(),
+                payment.getQuantity(),
+                payment.getPrice(),
+                payment.getCreatedAt()
+                );
     }
 
     @Transactional
-    public void createPayment(CreatePaymentRequest createPaymentRequest) {
-        log.info("createPayment 서비스 진입");
-        log.info("createPaymentRequestId : {}", createPaymentRequest.getOrderNum());
+    public PaymentDetailsResponse createPayment(CreatePaymentRequest createPaymentRequest) {
+//        log.info("createPayment 서비스 진입");
+//        log.info("createPaymentRequestId : {}", createPaymentRequest.getOrderNum());
+        OrderResponse orderResponse = orderClient.getOrderDetails(createPaymentRequest.getOrderNum());
+        if(orderResponse.getStatus() != OrderStatus.IN_PROGRESS) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
 
-        Payment payment = Payment.create(createPaymentRequest);
+        double chance = Math.random();
+        if (chance < 0.2) {
+            orderClient.failedByCustomer(createPaymentRequest.getOrderNum());
+            throw new CustomException(ErrorCode.FAILED_CUSTOMER);
+        }
 
-        log.info("payment 생성 : {}", payment);
-        log.info("payment id : {}", payment.getOrderNum());
+        OrderResponse completeOrderResponse = orderClient.completeOrder(createPaymentRequest.getOrderNum());
+
+        Payment payment = Payment.create(completeOrderResponse.getOrderNum(), completeOrderResponse.getBuyerNum(), completeOrderResponse.getQuantity(), completeOrderResponse.getPrice());
+
+//        log.info("payment 생성 : {}", payment);
+//        log.info("payment id : {}", payment.getOrderNum());
 
         Payment newPayment = paymentRepository.save(payment);
 
-        log.info("payment 저장 : {}", newPayment);
+//        log.info("payment 저장 : {}", newPayment);
+
+        return new PaymentDetailsResponse(newPayment.getPaymentNum(), newPayment.getOrderNum(), newPayment.getBuyerNum(), newPayment.getQuantity(), newPayment.getPrice(), newPayment.getCreatedAt());
     }
+
 
     @Transactional
     public void delete(Long paymentNum) {

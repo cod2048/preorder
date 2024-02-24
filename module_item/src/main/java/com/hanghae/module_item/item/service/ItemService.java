@@ -45,10 +45,10 @@ public class ItemService {
 
         Item savedItem = itemRepository.save(newitem);
 
-        log.info("itemService before make stockRequest : {}", createItemRequest.getStock());
+//        log.info("itemService before make stockRequest : {}", createItemRequest.getStock());
 
         StockDto stockRequest = new StockDto(savedItem.getItemNum(), createItemRequest.getStock());
-        log.info("itemService after make stockRequest : {}", stockRequest.getStock());
+//        log.info("itemService after make stockRequest : {}", stockRequest.getStock());
         StockDto stockResponse = stockClient.createStocks(stockRequest);
 
         return new CreateItemResponse(savedItem, stockResponse);
@@ -131,7 +131,7 @@ public class ItemService {
                 targetItem.getTitle(),
                 targetItem.getDescription(),
                 targetItem.getPrice(),
-                0L,
+                null,
                 targetItem.getAvailableAt(),
                 targetItem.getEndAt()
         );

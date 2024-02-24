@@ -1,6 +1,7 @@
 package com.hanghae.modlue_payment.payment.controller;
 
 import com.hanghae.modlue_payment.common.dto.response.ApiResponse;
+import com.hanghae.modlue_payment.payment.dto.request.CreatePaymentRequest;
 import com.hanghae.modlue_payment.payment.dto.response.PaymentDetailsResponse;
 import com.hanghae.modlue_payment.payment.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,13 @@ public class PaymentController {
 
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
+    }
+
+    @PostMapping
+    public ResponseEntity<PaymentDetailsResponse> createPayment(@RequestBody CreatePaymentRequest createPaymentRequest){
+//        log.info("createPayment 컨트롤러 진입");
+        PaymentDetailsResponse response = paymentService.createPayment(createPaymentRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{orderNum}")

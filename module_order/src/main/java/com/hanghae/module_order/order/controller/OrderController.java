@@ -21,6 +21,19 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @GetMapping("/{orderNum}")
+    public ResponseEntity<ApiResponse<OrderResponse>> getOrderDetails(@PathVariable Long orderNum) {
+        OrderResponse orderResponse = orderService.getOrderDetails(orderNum);
+
+        ApiResponse<OrderResponse> response = new ApiResponse<>(
+                HttpStatus.OK,
+                "주문 정보 조회 결과",
+                orderResponse
+        );
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> create(@RequestBody CreateOrderRequest createOrderRequest) {
         OrderResponse orderResponse = orderService.create(createOrderRequest);
@@ -34,18 +47,6 @@ public class OrderController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping("/try-payments/{orderNum}")
-    public ResponseEntity<ApiResponse<OrderResponse>> tryPayment(@PathVariable Long orderNum) {
-        OrderResponse orderResponse = orderService.tryPayment(orderNum);
-
-        ApiResponse<OrderResponse> response = new ApiResponse<>(
-                HttpStatus.OK,
-                "주문 시도 결과",
-                orderResponse
-        );
-
-        return ResponseEntity.ok().body(response);
-    }
 
     @DeleteMapping("/delete/{orderNum}")
     public ResponseEntity<ApiResponse<OrderResponse>> delete(@PathVariable Long orderNum) {

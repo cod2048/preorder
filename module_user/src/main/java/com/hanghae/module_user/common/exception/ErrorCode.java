@@ -14,6 +14,7 @@ public enum ErrorCode {
     PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST,"비밀번호는 필수입니다."),
     USER_ROLE_REQUIRED(HttpStatus.BAD_REQUEST,"판매자/구매자 구분은 필수입니다."),
     EMAIL_AUTH_CODE_INCORRECT(HttpStatus.UNAUTHORIZED,"이메일 인증 코드가 일치하지 않습니다."),
+    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
     DELETED_USER(HttpStatus.NOT_FOUND, "탈퇴한 사용자 입니다."),
 
     // Email
