@@ -116,7 +116,11 @@ public class UserService {
             throw new CustomException(ErrorCode.DELETED_USER);
         }
 
-        String encodedNewPassword = bCryptPasswordEncoder.encode(updatePasswordRequest.getPassword());
+        if(!bCryptPasswordEncoder.matches(updatePasswordRequest.getOriginalPassword(), targetUser.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        String encodedNewPassword = bCryptPasswordEncoder.encode(updatePasswordRequest.getNewPassword());
 
         targetUser.updatePassword(encodedNewPassword);
 
