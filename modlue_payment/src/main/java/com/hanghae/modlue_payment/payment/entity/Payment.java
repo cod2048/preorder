@@ -7,8 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,6 +19,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Payment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_num")
+    private Long paymentNum;
+
     @Column(name = "order_num", nullable = false)
     private Long orderNum;
 
@@ -27,29 +33,33 @@ public class Payment {
     private Long quantity;
 
     @Column(name = "price", nullable = false)
-    private Long price;
+    private BigDecimal price;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Column(name= "deleted_at")
     private LocalDateTime deletedAt;
 
     @Builder
-    public Payment(Long orderNum, Long buyerNum, Long quantity, Long price) {
+    public Payment(Long orderNum, Long buyerNum, Long quantity, BigDecimal price) {
         this.orderNum = orderNum;
         this.buyerNum = buyerNum;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public static Payment create(CreatePaymentRequest createPaymentRequest) {
+    public static Payment create(Long orderNum, Long buyerNum, Long quantity, BigDecimal price) {
         return Payment.builder()
-                .orderNum(createPaymentRequest.getOrderNum())
-                .buyerNum(createPaymentRequest.getBuyerNum())
-                .quantity(createPaymentRequest.getQuantity())
-                .price(createPaymentRequest.getPrice())
+                .orderNum(orderNum)
+                .buyerNum(buyerNum)
+                .quantity(quantity)
+                .price(price)
                 .build();
     }
 

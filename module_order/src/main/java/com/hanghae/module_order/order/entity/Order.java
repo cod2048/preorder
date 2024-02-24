@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,7 +34,7 @@ public class Order {
     private Long quantity;
 
     @Column(name = "price", nullable = false)
-    private Long price;
+    private BigDecimal price;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -48,7 +49,7 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Order(Long buyerNum, Long itemNum, Long quantity, Long price, OrderStatus status) {
+    public Order(Long buyerNum, Long itemNum, Long quantity, BigDecimal price, OrderStatus status) {
         this.buyerNum = buyerNum;
         this.itemNum = itemNum;
         this.quantity = quantity;
@@ -71,7 +72,6 @@ public class Order {
         IN_PROGRESS,
         COMPLETED,
         FAILED_CUSTOMER,
-        FAILED_QUANTITY,
         CANCELED
     }
 
@@ -82,5 +82,9 @@ public class Order {
     public void delete() {
         this.status = OrderStatus.CANCELED;
     }
+
+    public void failed() { this.status = OrderStatus.FAILED_CUSTOMER; }
+
+    public void complete() { this.status = OrderStatus.COMPLETED; }
 
 }

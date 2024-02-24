@@ -21,21 +21,21 @@ public class StockService {
 
     @Transactional
     public StockDto create(StockDto requestDto) {
-        log.info("stockSerivce, requestDto:{}",  requestDto.getItemNum());
-        log.info("stockService, requestDto: {}", requestDto.getStock());
+//        log.info("stockSerivce, requestDto:{}",  requestDto.getItemNum());
+//        log.info("stockService, requestDto: {}", requestDto.getStock());
 
         Stock newStock = Stock.create(requestDto.getItemNum(), requestDto.getStock());
-        log.info("stockSerivce, newStock: {}",  newStock.getStock());
+//        log.info("stockSerivce, newStock: {}",  newStock.getStock());
 
         Stock savedStock = stockRepository.save(newStock);
-        log.info("stockSerivce, savedStock:{}",  savedStock.getStock());
+//        log.info("stockSerivce, savedStock:{}",  savedStock.getStock());
 
         return new StockDto(savedStock.getItemNum(), savedStock.getStock());
     }
 
+    @Transactional
     public StockDto getStocks(Long itemNum) {
-        Stock stock = stockRepository.findById(itemNum)
-                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
+        Stock stock = stockRepository.findAndLockById(itemNum);
 
         return new StockDto(stock.getItemNum(), stock.getStock());
     }
@@ -72,11 +72,20 @@ public class StockService {
 
         Long originalStock = targetStock.getStock();
 
-        if (originalStock - requestDto.getStock() < 0L) {
-            return new StockDto(targetStock.getItemNum(), null);
+        targetStock.updateStocks(originalStock - requestDto.getStock());
+
+        return new StockDto(targetStock.getItemNum(), targetStock.getStock());
+    }
+
+    @Transactional
+    public synchronized StockDto updateStocks(StockDto requestDto) {
+        Stock targetStock = stockRepository.findAndLockById(requestDto.getItemNum());
+
+        if (targetStock == null) {
+            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
         }
 
-        targetStock.updateStocks(originalStock - requestDto.getStock());
+        targetStock.updateStocks(requestDto.getStock());
 
         return new StockDto(targetStock.getItemNum(), targetStock.getStock());
     }

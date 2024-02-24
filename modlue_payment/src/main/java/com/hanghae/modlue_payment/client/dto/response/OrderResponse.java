@@ -1,22 +1,22 @@
-package com.hanghae.modlue_payment.payment.dto.response;
+package com.hanghae.modlue_payment.client.dto.response;
 
+import com.hanghae.modlue_payment.common.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @ToString
-public class PaymentDetailsResponse {
-    private Long paymentNum;
+public class OrderResponse {
     private Long orderNum;
     private Long buyerNum;
+    private Long itemNum;
     private Long quantity;
     private BigDecimal price;
-    private LocalDateTime createdAt;
+    private OrderStatus status;
 }

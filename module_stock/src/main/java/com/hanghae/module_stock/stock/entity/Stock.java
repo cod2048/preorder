@@ -31,7 +31,7 @@ public class Stock {
                 .stock(stock)
                 .build();
     }
-
+    
     public void updateStocks(Long newStock){
         this.stock = newStock;
     }

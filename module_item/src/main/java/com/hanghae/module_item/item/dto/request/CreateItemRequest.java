@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class CreateItemRequest {
     private Long sellerNum;
     private String title;
     private String description;
-    private Long price;
+    private BigDecimal price;
     private Long stock;
     private LocalDateTime availableAt;
     private LocalDateTime endAt;

@@ -17,9 +17,9 @@ public class InternalStockController {
     }
 
     @PostMapping
-    public ResponseEntity<StockDto> createStocks(@RequestBody StockDto stockRequest) {
-        log.info("stockController : {}", stockRequest.getStock());
-        StockDto responseDto = stockService.create(stockRequest);
+    public ResponseEntity<StockDto> createStocks(@RequestBody StockDto requestDto) {
+//        log.info("stockController : {}", requestDto.getStock());
+        StockDto responseDto = stockService.create(requestDto);
 
         return ResponseEntity.ok().body(responseDto);
     }
@@ -39,8 +39,8 @@ public class InternalStockController {
         return ResponseEntity.ok().body("delete success");
     }
 
-    @PutMapping("/increase/{itemNum}")
-    public ResponseEntity<StockDto> increaseStocks(@PathVariable Long itemNum, @RequestBody StockDto requestDto) {
+    @PutMapping("/increase")
+    public ResponseEntity<StockDto> increaseStocks(@RequestBody StockDto requestDto) {
 
         StockDto responseDto = stockService.increaseStocks(requestDto);
 
@@ -48,8 +48,8 @@ public class InternalStockController {
     }
 
 
-    @PutMapping("/reduce/{itemNum}")
-    public ResponseEntity<StockDto> reduceStocks(@PathVariable Long itemNum, @RequestBody StockDto requestDto) {
+    @PutMapping("/reduce")
+    public ResponseEntity<StockDto> reduceStocks(@RequestBody StockDto requestDto) {
 
         StockDto responseDto = stockService.reduceStocks(requestDto);
 
