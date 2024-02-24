@@ -4,16 +4,14 @@ import com.hanghae.module_item.client.UserClient;
 import com.hanghae.module_item.client.dto.GetUserRoleResponse;
 import com.hanghae.module_item.common.exception.CustomException;
 import com.hanghae.module_item.common.exception.ErrorCode;
+import com.hanghae.module_item.client.StockClient;
+import com.hanghae.module_item.client.dto.StockDto;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
-import com.hanghae.module_item.item.dto.request.UpdateStockRequest;
 import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
 import com.hanghae.module_item.item.dto.response.CreateItemResponse;
 import com.hanghae.module_item.item.dto.response.ItemDetailsResponse;
-import com.hanghae.module_item.item.dto.response.StockResponse;
 import com.hanghae.module_item.item.entity.Item;
-import com.hanghae.module_item.item.entity.Stock;
 import com.hanghae.module_item.item.repository.ItemRepository;
-import com.hanghae.module_item.item.repository.StockRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +24,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
-    private final StockRepository stockRepository;
     private final UserClient userClient;
+    private final StockClient stockClient;
 
-    public ItemService(ItemRepository itemRepository, StockRepository stockRepository, UserClient userClient) {
+    public ItemService(ItemRepository itemRepository, UserClient userClient, StockClient stockClient) {
         this.itemRepository = itemRepository;
-        this.stockRepository = stockRepository;
         this.userClient = userClient;
+        this.stockClient = stockClient;
     }
 
     @Transactional
@@ -47,20 +45,21 @@ public class ItemService {
 
         Item savedItem = itemRepository.save(newitem);
 
-        Stock stock = Stock.create(savedItem.getItemNum(), createItemRequest.getStock());
+        log.info("itemService before make stockRequest : {}", createItemRequest.getStock());
 
-        Stock savedStock = stockRepository.save(stock);
+        StockDto stockRequest = new StockDto(savedItem.getItemNum(), createItemRequest.getStock());
+        log.info("itemService after make stockRequest : {}", stockRequest.getStock());
+        StockDto stockResponse = stockClient.createStocks(stockRequest);
 
-        return new CreateItemResponse(savedItem, savedStock);
+        return new CreateItemResponse(savedItem, stockResponse);
     }
 
     public List<String> getAllItems(){
-        List<String> titles = itemRepository.findAllByDeletedAtIsNull()
+
+        return itemRepository.findAllByDeletedAtIsNull()
                 .stream()
                 .map(Item::getTitle)
                 .collect(Collectors.toList());
-
-        return titles;
     }
 
     public ItemDetailsResponse getItemDetails(Long itemNum){
@@ -71,8 +70,7 @@ public class ItemService {
             throw new CustomException(ErrorCode.DELETED_ITEM);
         }
 
-        Stock stocks = stockRepository.findById(itemNum)
-                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
+        StockDto stocks = stockClient.getStocks(itemNum);
 
         return new ItemDetailsResponse(
                 item.getItemNum(),
@@ -86,64 +84,9 @@ public class ItemService {
         );
     }
 
-    public Long getItemStocks(Long itemNum) {
-        Stock stocks = stockRepository.findById(itemNum)
-                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND));
+    public StockDto getItemStocks(Long itemNum) {
 
-        return stocks.getStock();
-    }
-
-    @Transactional
-    public synchronized StockResponse reduceItemStocks(UpdateStockRequest updateStockRequest) {
-        Long itemNum = updateStockRequest.getItemNum();
-        Long quantity = updateStockRequest.getQuantity();
-
-        Item targetItem = itemRepository.findById(itemNum)
-                .orElseThrow(()-> new CustomException(ErrorCode.ITEM_NOT_FOUND));
-
-        if (targetItem.getDeletedAt() != null) {
-            throw new CustomException(ErrorCode.DELETED_ITEM);
-        }
-
-        Stock itemStock = stockRepository.findAndLockById(itemNum);
-
-        if (itemStock == null) {
-            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
-        }
-
-        Long currentStock = itemStock.getStock();
-
-        if (currentStock < quantity) {
-            log.info("not enough stocks");
-        } else {
-            Long updateStock = currentStock - quantity;
-            itemStock.updateStocks(updateStock);
-
-        }
-        return new StockResponse(itemNum, itemStock.getStock());
-    }
-
-    @Transactional
-    public synchronized StockResponse increaseItemStocks(UpdateStockRequest updateStockRequest) {
-        Long itemNum = updateStockRequest.getItemNum();
-        Long quantity = updateStockRequest.getQuantity();
-
-        Item targetItem = itemRepository.findById(itemNum)
-                .orElseThrow(()-> new CustomException(ErrorCode.ITEM_NOT_FOUND));
-
-        if (targetItem.getDeletedAt() != null) {
-            throw new CustomException(ErrorCode.DELETED_ITEM);
-        }
-
-        Stock itemStock = stockRepository.findAndLockById(itemNum);
-
-        if (itemStock == null) {
-            throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
-        }
-
-        itemStock.updateStocks(itemStock.getStock() + quantity);
-
-        return new StockResponse(itemNum, itemStock.getStock());
+        return stockClient.getStocks(itemNum);
     }
 
     @Transactional
@@ -155,7 +98,7 @@ public class ItemService {
             throw new CustomException(ErrorCode.DELETED_ITEM);
         }
 
-        Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        StockDto targetStock = stockClient.getStocks(itemNum);
 
         targetItem.update(updateItemRequest);
 
@@ -179,10 +122,7 @@ public class ItemService {
             throw new CustomException(ErrorCode.DELETED_ITEM);
         }
 
-        Stock targetStock = stockRepository.findById(itemNum).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
-
-        stockRepository.delete(targetStock);
-
+        stockClient.deleteStocks(itemNum);
         targetItem.delete();
 
         return new ItemDetailsResponse(

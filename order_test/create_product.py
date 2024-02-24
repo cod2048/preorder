@@ -36,11 +36,6 @@ def insert_products():
             cursor.execute(pre_order_product_query, pre_order_product_values)
             pre_order_product_id = cursor.lastrowid
 
-            # 재고 등록
-            stock_query = "INSERT INTO stock (item_num, stock) VALUES (%s, %s)"
-            cursor.execute(stock_query, (normal_product_id, 10))
-            cursor.execute(stock_query, (pre_order_product_id, 10))
-
             connection.commit()
 
             print(f"일반 상품과 예약 상품이 성공적으로 등록되었습니다. 상품 번호: {normal_product_id}, {pre_order_product_id}")

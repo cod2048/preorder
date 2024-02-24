@@ -1,5 +1,6 @@
 package com.hanghae.module_item.item.controller;
 
+import com.hanghae.module_item.client.dto.StockDto;
 import com.hanghae.module_item.common.dto.response.ApiResponse;
 import com.hanghae.module_item.item.dto.request.CreateItemRequest;
 import com.hanghae.module_item.item.dto.request.UpdateItemRequest;
@@ -58,8 +59,8 @@ public class ItemController {
     }
 
     @GetMapping("/stocks/{itemNum}")
-    public ResponseEntity<ApiResponse<Long>> getItemStocks(@PathVariable Long itemNum) {
-        ApiResponse<Long> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponse<StockDto>> getItemStocks(@PathVariable Long itemNum) {
+        ApiResponse<StockDto> response = new ApiResponse<>(
                 HttpStatus.OK,
                 "상품 재고 : ",
                 itemService.getItemStocks(itemNum)
