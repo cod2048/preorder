@@ -18,14 +18,21 @@ def insert_products():
             # 재고 등록
             stock_query = "INSERT INTO stock (item_num, stock) VALUES (%s, %s)"
             cursor.execute(stock_query, (1, 10))
-            normal_product_id = cursor.lastrowid
+
+            retrieve_query = "SELECT * FROM stock WHERE item_num = %s"
+            cursor.execute(retrieve_query, (1 ,))
+            inserted_data = cursor.fetchone()
+
+            print(f"삽입된 데이터: {inserted_data}")
 
             cursor.execute(stock_query, (2, 10))
-            pre_order_product_id = cursor.lastrowid
+
+            retrieve_query = "SELECT * FROM stock WHERE item_num = %s"
+            cursor.execute(retrieve_query, (2 ,))
+            inserted_data = cursor.fetchone()
+            print(f"삽입된 데이터: {inserted_data}")
 
             connection.commit()
-
-            print(f"일반 상품과 예약 상품이 성공적으로 등록되었습니다. 상품 번호: {normal_product_id}, {pre_order_product_id}")
 
     except Error as e:
         print("데이터베이스 연결 또는 쿼리 실행 중 오류 발생:", e)
