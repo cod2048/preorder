@@ -34,7 +34,7 @@ public class StockService {
     }
 
     @Transactional
-    public StockDto getStocks(Long itemNum) {
+    public synchronized StockDto getStocks(Long itemNum) {
         Stock stock = stockRepository.findAndLockById(itemNum);
 
         return new StockDto(stock.getItemNum(), stock.getStock());
@@ -57,7 +57,7 @@ public class StockService {
 
         Long originalStock = targetStock.getStock();
 
-        targetStock.updateStocks(originalStock + requestDto.getStock());
+        targetStock.update(originalStock + requestDto.getStock());
 
         return new StockDto(targetStock.getItemNum(), targetStock.getStock());
     }
@@ -72,7 +72,11 @@ public class StockService {
 
         Long originalStock = targetStock.getStock();
 
-        targetStock.updateStocks(originalStock - requestDto.getStock());
+        if (originalStock == 0) {
+            throw new CustomException(ErrorCode.NOT_ENOUGH_STOCK);
+        }
+
+        targetStock.update(originalStock - requestDto.getStock());
 
         return new StockDto(targetStock.getItemNum(), targetStock.getStock());
     }
@@ -85,7 +89,7 @@ public class StockService {
             throw new CustomException(ErrorCode.ITEM_STOCK_NOT_FOUND);
         }
 
-        targetStock.updateStocks(requestDto.getStock());
+        targetStock.update(requestDto.getStock());
 
         return new StockDto(targetStock.getItemNum(), targetStock.getStock());
     }

@@ -32,7 +32,7 @@ public class Stock {
                 .build();
     }
     
-    public void updateStocks(Long newStock){
+    public void update(Long newStock){
         this.stock = newStock;
     }
 }

@@ -38,16 +38,15 @@ public class OrderService {
 
     @Transactional
     public OrderResponse create(CreateOrderRequest createOrderRequest) {
-        StockDto currentStocks = stockClient.getStocks(createOrderRequest.getItemNum());
-
-        if(currentStocks.getStock() < createOrderRequest.getQuantity()) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_STOCK);
-        }
 
         ItemDetailsResponse itemDetailsResponse = itemClient.getItemDetails(createOrderRequest.getItemNum()); // 아이템 정보
 
         LocalDateTime availableAt = itemDetailsResponse.getAvailableAt();
         LocalDateTime endAt = itemDetailsResponse.getEndAt();
+
+        if(itemDetailsResponse.getStock() < createOrderRequest.getQuantity()) {
+            throw new CustomException(ErrorCode.NOT_ENOUGH_STOCK);
+        }
 
         if(isNotPreOrderTime(availableAt, endAt)) {
             throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
