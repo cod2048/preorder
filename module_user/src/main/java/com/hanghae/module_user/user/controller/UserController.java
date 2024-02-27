@@ -5,7 +5,6 @@ import com.hanghae.module_user.user.dto.request.CreateUserRequest;
 import com.hanghae.module_user.user.dto.request.UpdatePasswordRequest;
 import com.hanghae.module_user.user.dto.request.UpdateUserRequest;
 import com.hanghae.module_user.user.dto.response.UserResponse;
-import com.hanghae.module_user.user.entity.User;
 import com.hanghae.module_user.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
